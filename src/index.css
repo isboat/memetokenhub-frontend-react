@@ -1404,3 +1404,441 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Dark market theme ---------------------------------------------------------
+   The layered navy surfaces and compact data treatments borrow familiar
+   cryptocurrency-dashboard patterns while preserving MemeTokenHub's identity. */
+:root {
+  color-scheme: dark;
+  color: #f3f6ff;
+  background: #070b14;
+  --surface: #0e1421;
+  --surface-raised: #131b2b;
+  --surface-soft: #182235;
+  --border: #253149;
+  --muted: #8c99ae;
+  --brand: #5271ff;
+  --cyan: #20d9c2;
+}
+
+body {
+  color: #f3f6ff;
+  background:
+    radial-gradient(
+      circle at 72% 8%,
+      rgba(43, 73, 160, 0.2),
+      transparent 29rem
+    ),
+    #070b14;
+}
+
+.market-bar {
+  border-bottom: 1px solid #1d2638;
+  background: #080d17;
+}
+.market-bar-inner {
+  width: min(1220px, calc(100% - 40px));
+  min-height: 31px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  color: #77849a;
+  font-size: 9px;
+  font-weight: 650;
+}
+.market-bar strong {
+  margin-left: 4px;
+  color: #c7d0df;
+}
+.market-bar em {
+  margin-left: 3px;
+  color: #21d19f;
+  font-style: normal;
+}
+.market-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.market-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #21d19f;
+  box-shadow: 0 0 8px #21d19f;
+}
+.site-header {
+  border-color: rgba(44, 58, 82, 0.7);
+  background: rgba(8, 13, 23, 0.9);
+}
+.header-inner {
+  height: 68px;
+}
+.brand {
+  color: #fff;
+}
+.brand-mark {
+  background: linear-gradient(145deg, #5271ff, #7b52ff);
+  box-shadow: 0 7px 22px rgba(82, 113, 255, 0.32);
+}
+.brand > span:last-child,
+.footer-brand > span:last-child {
+  color: #7d92ff;
+}
+.nav-link {
+  color: #929eb1;
+}
+.nav-link:hover,
+.nav-link.active {
+  color: white;
+}
+.nav-link.active {
+  position: relative;
+}
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -26px;
+  left: 0;
+  height: 2px;
+  background: #6882ff;
+}
+.watchlist-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #aeb8c9;
+  font-size: 11px;
+  font-weight: 750;
+}
+.watchlist-link svg {
+  color: #ffce46;
+}
+.icon-button {
+  color: #aab5c7;
+}
+.icon-button:hover {
+  background: #172033;
+}
+.button-primary {
+  background: linear-gradient(135deg, #5271ff, #6d50eb);
+  box-shadow: 0 10px 28px rgba(61, 88, 224, 0.3);
+}
+.button-primary:hover {
+  background: linear-gradient(135deg, #6580ff, #7b5cf2);
+}
+.button-secondary {
+  color: #e9edfa;
+  border-color: #2c3850;
+  background: #111827;
+}
+.button-secondary:hover {
+  border-color: #475977;
+  background: #172136;
+}
+
+.hero {
+  min-height: 630px;
+  padding-block: 72px 64px;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 100px 0 auto;
+  height: 600px;
+  z-index: -1;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(81, 105, 152, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(81, 105, 152, 0.12) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent, black 20%, transparent);
+}
+.eyebrow {
+  color: #8ca2ff;
+  border-color: #2c3e6f;
+  background: rgba(38, 59, 111, 0.3);
+}
+.eyebrow.purple {
+  color: #9badff;
+  border-color: #354570;
+  background: #16213a;
+}
+.eyebrow.green {
+  color: #35dfb2;
+  border-color: #1c584e;
+  background: #0d2a27;
+}
+.hero h1,
+.page-intro h1 {
+  color: #f7f9ff;
+  font-size: clamp(50px, 5.6vw, 76px);
+}
+.hero h1 span,
+.page-intro h1 span {
+  color: transparent;
+  background: linear-gradient(90deg, #758cff, #a078ff 55%, #3bd9cb);
+  background-clip: text;
+}
+.hero-copy > p {
+  color: #9aa6b9;
+}
+.hero-proof {
+  color: #738095;
+}
+.hero-proof strong {
+  color: #dce3ef;
+}
+.avatar-stack span {
+  border-color: #070b14;
+  background: #1d293d;
+}
+.hero-visual::before {
+  background: radial-gradient(circle, rgba(67, 96, 215, 0.3), transparent 65%);
+}
+.orbit {
+  border-color: rgba(95, 123, 234, 0.32);
+}
+.hero-coin {
+  border-color: #172033;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.48),
+    0 0 55px rgba(76, 106, 229, 0.15);
+}
+.coin-main strong {
+  background: #080d17;
+}
+.coin-main small {
+  color: #2fd9a7;
+  background: #101929;
+}
+.floating-stat {
+  color: #8794a9;
+  border-color: #2b3850;
+  background: rgba(15, 23, 38, 0.92);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+.floating-stat strong {
+  color: #edf2fc;
+}
+
+.ticker {
+  border-color: #263147;
+  background: #0e1522;
+}
+.ticker-track > div {
+  position: relative;
+}
+.ticker-track > div + div::before {
+  content: "";
+  position: absolute;
+  left: -25px;
+  height: 18px;
+  border-left: 1px solid #2a3549;
+}
+.section-heading h2,
+.trust-copy h2,
+.cta-card h2 {
+  color: #f5f7fc;
+}
+.section-heading p,
+.trust-copy p {
+  color: var(--muted);
+}
+.text-link {
+  color: #8fa2ff;
+}
+.search-field {
+  color: #758197;
+  border-color: #263249;
+  background: #101725;
+}
+.search-field:focus-within {
+  border-color: #5873ef;
+  box-shadow: 0 0 0 3px rgba(82, 113, 255, 0.13);
+}
+.search-field input {
+  color: #edf1fa;
+}
+.search-field input::placeholder {
+  color: #657187;
+}
+.network-filters {
+  background: #101725;
+  border: 1px solid #222d41;
+}
+.network-filters button {
+  color: #8793a7;
+}
+.network-filters button.active {
+  color: #fff;
+  background: #26385f;
+  box-shadow: none;
+}
+.token-card {
+  border-color: #243047;
+  background: #0e1522;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+}
+.token-card:hover {
+  border-color: #3a4b6a;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.36);
+}
+.token-status,
+.network-pill {
+  background: rgba(8, 14, 25, 0.82);
+  color: #d7deea;
+}
+.token-status {
+  color: #ff976b;
+}
+.token-title-row h3,
+.token-stats strong {
+  color: #eef2fa;
+}
+.symbol,
+.token-description,
+.token-stats span,
+.sentiment-label {
+  color: #7f8ba0;
+}
+.price-change {
+  color: #2ed6a1 !important;
+  background: rgba(31, 176, 131, 0.12);
+}
+.price-change.negative {
+  color: #ff7180 !important;
+  background: rgba(229, 75, 91, 0.12);
+}
+.token-stats,
+.token-stats div + div,
+.card-link {
+  border-color: #202b3e;
+}
+.sentiment-label strong,
+.card-link {
+  color: #91a3ff;
+}
+.sentiment-track {
+  background: #202b3d;
+}
+.sentiment-track span {
+  background: linear-gradient(90deg, #5271ff, #8e68ff);
+}
+.empty-state {
+  color: #8793a7;
+  border-color: #30405b;
+  background: #0e1522;
+}
+
+.trust-section {
+  border-block: 1px solid #1e2b40;
+  background: #0b111c;
+}
+.feature-grid article {
+  border-color: #253149;
+  background: linear-gradient(145deg, #111a2a, #0e1522);
+}
+.feature-grid p {
+  color: #8591a5;
+}
+.leader-card,
+.learning-grid article,
+.dashboard-grid article,
+.detail-stats article {
+  border-color: #253149;
+  background: #0e1522;
+}
+.leader-card h3,
+.leader-followers strong,
+.learning-grid h2,
+.dashboard-grid strong,
+.detail-stats strong {
+  color: #eef2fb;
+}
+.leader-card p,
+.leader-followers span,
+.learning-grid p,
+.dashboard-grid p,
+.detail-stats span,
+.detail-stats em {
+  color: #8290a6;
+}
+.leader-avatar {
+  background: #202b40;
+}
+.leader-badge {
+  color: #a9b6ff;
+  background: #202d52;
+}
+.leader-card button {
+  color: #9bafff;
+  border-color: #334260;
+  background: #121b2b;
+}
+.leader-card button:hover {
+  background: #5271ff;
+  border-color: #5271ff;
+}
+.cta-card {
+  border: 1px solid #536fda;
+  background:
+    linear-gradient(120deg, rgba(47, 68, 146, 0.95), rgba(75, 47, 151, 0.92)),
+    #273c88;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.3);
+}
+.footer {
+  border-top: 1px solid #202b3d;
+  background: #060a11;
+}
+.footer-bottom {
+  border-color: #202b3d;
+}
+.back-link,
+.page-intro > p,
+.details-hero p,
+.not-found p {
+  color: #8d99ad;
+}
+.detail-mascot {
+  border-color: #172033;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.4);
+}
+.not-found > span {
+  color: #728aff;
+}
+
+@media (max-width: 700px) {
+  .market-bar-inner {
+    width: calc(100% - 28px);
+    overflow-x: auto;
+    gap: 18px;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+  .market-status {
+    margin-left: 0;
+    padding-right: 10px;
+  }
+  .header-inner {
+    height: 64px;
+  }
+  .watchlist-link {
+    display: none;
+  }
+  .mobile-nav {
+    border-color: #263249;
+    background: #0b111d;
+  }
+  .mobile-nav a.active {
+    color: #a9b6ff;
+    background: #1a2746;
+  }
+  .hero::before {
+    top: 80px;
+  }
+}

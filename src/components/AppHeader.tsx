@@ -1,4 +1,4 @@
-import { Menu, Search, Sparkles, X } from "lucide-react";
+import { Menu, Search, Sparkles, Star, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -13,6 +13,25 @@ export function AppHeader() {
 
   return (
     <header className="site-header">
+      <div className="market-bar">
+        <div className="market-bar-inner">
+          <span>
+            Coins <strong>2.4M+</strong>
+          </span>
+          <span>
+            Market cap <strong>$3.42T</strong> <em>+2.8%</em>
+          </span>
+          <span>
+            24h volume <strong>$184.6B</strong>
+          </span>
+          <span>
+            BTC dominance <strong>58.4%</strong>
+          </span>
+          <span className="market-status">
+            <i /> Markets online
+          </span>
+        </div>
+      </div>
       <div className="header-inner">
         <Link className="brand" to="/" aria-label="MemeTokenHub home">
           <span className="brand-mark">
@@ -39,6 +58,9 @@ export function AppHeader() {
         </nav>
 
         <div className="header-actions">
+          <Link className="watchlist-link" to="/dashboard">
+            <Star size={17} /> <span>Watchlist</span>
+          </Link>
           <button
             className="icon-button search-button"
             type="button"

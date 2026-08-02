@@ -18,7 +18,7 @@ describe("MemeTokenHub application", () => {
   it("renders the main discovery experience", () => {
     renderApplication();
     expect(
-      screen.getByRole("heading", { name: /find your next.*favorite meme/i }),
+      screen.getByRole("heading", { name: /the meme market.*made social/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Trending projects" }),

@@ -42,13 +42,13 @@ export function DiscoverPage() {
               <span className="live-dot" /> The culture is moving
             </div>
             <h1>
-              Find your next
+              The meme market,
               <br />
-              <span>favorite meme.</span>
+              <span>made social.</span>
             </h1>
             <p>
-              Discover the projects, people, and communities shaping meme
-              culture—before the rest of the internet catches on.
+              Track fast-moving projects, verified creators, and real community
+              sentiment—all from one trusted crypto-native hub.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="#trending">
@@ -66,9 +66,9 @@ export function DiscoverPage() {
                 <span>🦊</span>
               </div>
               <p>
-                <strong>42,000+ degens</strong>
+                <strong>42,000+ community members</strong>
                 <br />
-                already found their people
+                tracking the culture together
               </p>
             </div>
           </div>
