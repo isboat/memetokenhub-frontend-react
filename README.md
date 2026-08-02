@@ -38,6 +38,7 @@ The header is available on every page:
 - Select **Watchlist** to open the personalized dashboard.
 - Select **Connect** to sign in with Privy. Once authenticated, the same area links to the user's profile and provides a sign-out button.
 - Use the footer shortcuts to open notifications, payments and access, verification, safety information, and the main public areas.
+- Use the **Company** footer links to read About us, FAQ, Privacy policy, Terms of use, and contact information.
 
 Role-specific destinations such as My network, creator earnings, moderation, and user administration are not part of the primary header. Their direct routes are listed in the goal and route tables below; the backend still checks the signed-in account before returning protected data.
 
@@ -134,6 +135,9 @@ Vite prints the local development URL, normally `http://localhost:5173`.
 | `/profile/:userId`        | Public-safe user profile and social context.                                   |
 | `/learn`                  | Verification and organic-discovery trust center.                               |
 | `/about`                  | Product mission and trust information.                                         |
+| `/faq`                    | Answers about accounts, projects, verification, payments, and privacy.         |
+| `/privacy`                | Detailed privacy, data-use, sharing, retention, and user-rights policy.        |
+| `/terms`                  | Detailed account, content, conduct, payment, and platform-use terms.           |
 | `/dashboard`              | Protected personalized experience.                                             |
 | `/projects/manage`        | Capability-gated project creation, media, editing, and publication.            |
 | `/claims`                 | Private claim submission, history, evidence uploads, and appeals.              |

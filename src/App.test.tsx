@@ -144,6 +144,29 @@ describe("MemeTokenHub application", () => {
     expect(screen.getByText("95% hot")).toBeInTheDocument();
   });
 
+  it.each([
+    ["/about", "Built for culture. Designed for context."],
+    ["/faq", "Questions are a feature."],
+    ["/privacy", "Your privacy deserves plain language."],
+    ["/terms", "Clear rules keep the culture fun."],
+  ])("renders the informational page at %s", (route, heading) => {
+    renderApplication(route);
+    expect(
+      screen.getByRole("heading", { level: 1, name: heading }),
+    ).toBeInTheDocument();
+    for (const [name, href] of [
+      ["About us", "/about"],
+      ["FAQ", "/faq"],
+      ["Privacy policy", "/privacy"],
+      ["Terms of use", "/terms"],
+    ])
+      expect(
+        screen
+          .getAllByRole("link", { name })
+          .some((link) => link.getAttribute("href") === href),
+      ).toBe(true);
+  });
+
   it("routes follow actions through the sign-in dashboard", async () => {
     const user = userEvent.setup();
     renderApplication();

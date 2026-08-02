@@ -26,6 +26,9 @@ export function Footer() {
         <div>
           <h3>Company</h3>
           <Link to="/about">About us</Link>
+          <Link to="/faq">FAQ</Link>
+          <Link to="/privacy">Privacy policy</Link>
+          <Link to="/terms">Terms of use</Link>
           <Link to="/learn">Safety</Link>
           <a href="mailto:hello@memetokenhub.com">Contact</a>
         </div>

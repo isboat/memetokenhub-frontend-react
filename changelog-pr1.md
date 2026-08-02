@@ -4,7 +4,7 @@
 
 This document records the complete frontend implementation delivered by the first MemeTokenHub frontend pull request. The change set transforms the repository from its initial placeholder into a runnable, typed, tested, responsive React single-page application with authentication, six backend-domain clients, user and moderator workflows, CI/CD, Azure Static Web Apps deployment configuration, and detailed project documentation.
 
-The changelog covers the cumulative changes from the initial repository state through commit `8f61238` and includes the follow-up corrections made during review. Including this changelog, the PR adds or updates 52 tracked paths and introduces approximately 34,000 lines, most of which are the reproducible npm lockfile and the application source/styles.
+The changelog covers the cumulative changes from the initial repository state and includes the follow-up corrections and informational pages added during review. The PR adds or updates 53 tracked paths and introduces more than 35,000 lines, most of which are the reproducible npm lockfile and the application source/styles.
 
 ## Implementation timeline
 
@@ -87,6 +87,9 @@ The React Router application now supports:
 | `/profile/:userId`        | Public-safe user profile, reputation, follows, and activity                                      | Public                             |
 | `/learn`                  | Trust, safety, verification, provenance, and organic-discovery education                         | Public                             |
 | `/about`                  | Product mission and trust information                                                            | Public                             |
+| `/faq`                    | Frequently asked questions about accounts, projects, verification, payments, and privacy         | Public                             |
+| `/privacy`                | Privacy, collection, use, sharing, retention, security, and user-rights details                  | Public                             |
+| `/terms`                  | Eligibility, accounts, content, prohibited conduct, payments, disclaimers, and use terms         | Public                             |
 | `/dashboard`              | Personalized authenticated dashboard                                                             | Authenticated                      |
 | `/projects/manage`        | Project drafts, media, updates, and publication                                                  | Developer/creator capability       |
 | `/claims`                 | Claim submission, evidence, owner history, public badges, and appeals                            | Authenticated                      |
@@ -321,6 +324,20 @@ Internal `POST /api/notifications/send` is intentionally absent from browser cod
 - Restricted action links to local, non-protocol-relative application paths.
 - Documented event-driven delivery and the immediate application of opt-outs.
 
+## Company, legal, and help pages
+
+- Replaced the former About alias to the Learn page with a dedicated About us experience.
+- Added a mission statement explaining MemeTokenHub’s focus on context, provenance, private verification, transparent creator monetization, and separation of paid activity from organic signals.
+- Added an illustrated four-step explanation of discovery, authentication, participation, and independent decision-making.
+- Added a detailed Privacy Policy with an effective date and sections for scope, collected information, payment data, uses, sharing, cookies, retention, security, user choices and rights, international processing, children, updates, and contact.
+- Added detailed Terms of Use covering acceptance, eligibility, account security, user content licensing, moderation, prohibited behavior, project/verification limitations, creator payments, intellectual property, third parties, disclaimers, liability, termination, general provisions, and contact.
+- Added a grouped FAQ using accessible native disclosure controls for getting started, projects/community, verification, payments, notifications, and privacy.
+- Added explicit reminders that the platform is not an exchange, wallet, broker, or investment adviser and that badges and community signals are not guarantees.
+- Added cross-navigation between About, FAQ, Privacy Policy, and Terms of Use.
+- Added footer links to all four informational pages.
+- Added responsive desktop, tablet, and mobile layouts for legal summaries, long-form policy content, values, process steps, FAQ disclosures, and support calls to action.
+- Added route tests for every informational page and footer-link assertions.
+
 ## Local preview data and assets
 
 - Added typed local meme-token and community-leader fixtures for usable preview states.
@@ -341,7 +358,7 @@ Internal `POST /api/notifications/send` is intentionally absent from browser cod
 
 ### Covered behavior
 
-The 22-test suite covers:
+The 26-test suite covers:
 
 1. Main discovery rendering.
 2. Server-backed token search filtering.
@@ -365,6 +382,10 @@ The 22-test suite covers:
 20. Unsafe payment-provider checkout URL rejection.
 21. Subject-derived and compatibility Notification Service requests with internal send exclusion.
 22. Notification preference stability when unread filtering changes.
+23. Dedicated About us page routing and legal/company footer navigation.
+24. FAQ page routing and legal/company footer navigation.
+25. Privacy Policy routing and legal/company footer navigation.
+26. Terms of Use routing and legal/company footer navigation.
 
 ## Tooling and build configuration
 
@@ -453,7 +474,7 @@ Replaced the placeholder README with documentation for:
 - A recommended first-time user journey.
 - Goal-based navigation.
 - Access by visitor/member/developer/creator/KOL/moderator/admin role.
-- All 19 named application routes.
+- All 22 named application routes.
 - Installation and available scripts.
 - Environment variables and Privy token exchange.
 - User, Token, Social, Claim, Payment, and Notification Service feature coverage.
@@ -558,7 +579,8 @@ The PR includes the following review-driven corrections in addition to the initi
 ### Pages
 
 - `src/pages/DiscoverPage.tsx` — project search, network filters, feeds, preview fallback, and home content.
-- `src/pages/SupportingPages.tsx` — project details, dashboard, Learn/About, community support, and not-found content.
+- `src/pages/SupportingPages.tsx` — project details, dashboard, Learn, community support, and not-found content.
+- `src/pages/InformationPages.tsx` — About us, FAQ, Privacy Policy, and Terms of Use.
 - `src/pages/UserPages.tsx` — people, public profiles, private profile settings, social/wallet management, and role admin.
 - `src/pages/ProjectManagementPage.tsx` — project draft, media, update, and publication studio.
 - `src/pages/SocialPages.tsx` — Community, My network, and Insights experiences.
