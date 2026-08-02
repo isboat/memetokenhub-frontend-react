@@ -657,55 +657,72 @@ export function ModeratorClaimsPage() {
 export function PublicClaimStatusPage() {
   const { claimId = "" } = useParams();
   const [claim, setClaim] = useState<PublicClaimStatus>();
+  const [loadedClaimId, setLoadedClaimId] = useState("");
   const [message, setMessage] = useState(
     "Checking the public verification record…",
   );
   useEffect(() => {
+    let active = true;
+    setClaim(undefined);
+    setLoadedClaimId("");
+    setMessage("Checking the public verification record…");
     getPublicClaimStatus(claimId)
       .then((result) => {
-        setClaim(result);
-        setMessage("");
+        if (active) {
+          setClaim(result);
+          setLoadedClaimId(claimId);
+          setMessage("");
+        }
       })
-      .catch((error: unknown) =>
-        setMessage(
-          error instanceof Error
-            ? error.message
-            : "Verification record unavailable.",
-        ),
-      );
+      .catch((error: unknown) => {
+        if (active)
+          setMessage(
+            error instanceof Error
+              ? error.message
+              : "Verification record unavailable.",
+          );
+      });
+    return () => {
+      active = false;
+    };
   }, [claimId]);
+  const currentClaim = loadedClaimId === claimId ? claim : undefined;
   return (
     <main className="public-claim-page page-shell">
       <section className="public-claim-card">
         <BadgeCheck
-          className={claim?.status === "Approved" ? "verified-icon" : ""}
+          className={currentClaim?.status === "Approved" ? "verified-icon" : ""}
           size={46}
         />
         <span className="eyebrow purple">Public verification</span>
-        {claim ? (
+        {currentClaim ? (
           <>
             <h1>
-              {claim.status === "Approved"
+              {currentClaim.status === "Approved"
                 ? "Verified project relationship"
                 : "Claim status"}
             </h1>
-            <StatusPill status={claim.status} />
+            <StatusPill status={currentClaim.status} />
             <dl>
               <div>
                 <dt>Claim type</dt>
-                <dd>{claim.type}</dd>
+                <dd>{currentClaim.type}</dd>
               </div>
               <div>
                 <dt>Token</dt>
-                <dd>{claim.tokenId}</dd>
+                <dd>{currentClaim.tokenId}</dd>
               </div>
               <div>
                 <dt>Claimant</dt>
-                <dd>{claim.userId}</dd>
+                <dd>{currentClaim.userId}</dd>
               </div>
               <div>
                 <dt>Verified</dt>
-                <dd>{formatDate(claim.verifiedAt ?? claim.reviewedAt)}</dd>
+                <dd>
+                  {formatDate(
+                    currentClaim.verifiedAt ?? currentClaim.reviewedAt,
+                  )}
+                </dd>
               </div>
             </dl>
             <p className="privacy-note">

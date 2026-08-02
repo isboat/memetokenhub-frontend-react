@@ -27,6 +27,7 @@ import {
   getActivities,
   getFollowers,
   getFollowing,
+  getMyFollows,
   getReputation,
   type Activity,
   type Reputation,
@@ -171,7 +172,7 @@ export function PeopleDirectoryPage() {
 
 export function PublicUserProfilePage() {
   const { userId = "" } = useParams();
-  const { status: authStatus, login } = useAuth();
+  const { status: authStatus, user: authenticatedUser, login } = useAuth();
   const [profile, setProfile] = useState<PlatformUser | null>(null);
   const [channels, setChannels] = useState<SocialChannel[]>([]);
   const [message, setMessage] = useState("Loading public profile…");
@@ -183,6 +184,14 @@ export function PublicUserProfilePage() {
 
   useEffect(() => {
     let active = true;
+    setProfile(null);
+    setChannels([]);
+    setReputation(undefined);
+    setActivities([]);
+    setFollowerCount(0);
+    setFollowingCount(0);
+    setIsFollowing(false);
+    setMessage("Loading public profile…");
     Promise.all([
       getUser(userId),
       getSocialChannels(userId),
@@ -190,6 +199,9 @@ export function PublicUserProfilePage() {
       getActivities(userId, 10, 0),
       getFollowers(userId, 1, 0),
       getFollowing(userId, 1, 0),
+      authStatus === "authenticated"
+        ? getMyFollows("User", 100, 0)
+        : Promise.resolve([]),
     ])
       .then(
         ([
@@ -199,6 +211,7 @@ export function PublicUserProfilePage() {
           loadedActivities,
           followers,
           following,
+          viewerFollows,
         ]) => {
           if (active) {
             setProfile(loadedProfile);
@@ -210,6 +223,9 @@ export function PublicUserProfilePage() {
               loadedReputation.followersCount ?? followers.length,
             );
             setFollowingCount(following.length);
+            setIsFollowing(
+              viewerFollows.some((follow) => follow.targetId === userId),
+            );
           }
         },
       )
@@ -222,7 +238,7 @@ export function PublicUserProfilePage() {
     return () => {
       active = false;
     };
-  }, [userId]);
+  }, [authStatus, authenticatedUser?.userId, userId]);
 
   if (!profile)
     return (
@@ -316,7 +332,12 @@ export function PublicUserProfilePage() {
 }
 
 export function AccountSettingsPage() {
-  const { status: authStatus, login, logout } = useAuth();
+  const {
+    status: authStatus,
+    user: authenticatedUser,
+    login,
+    logout,
+  } = useAuth();
   const [user, setUser] = useState<PlatformUser | null>(null);
   const [channels, setChannels] = useState<SocialChannel[]>([]);
   const [message, setMessage] = useState("Loading your private profile…");
@@ -326,7 +347,18 @@ export function AccountSettingsPage() {
   const [verificationChallenge, setVerificationChallenge] = useState("");
 
   useEffect(() => {
-    if (authStatus !== "authenticated") return;
+    setUser(null);
+    setChannels([]);
+    setWalletProof("");
+    setPlatform("X");
+    setAuthorizationCode("");
+    setVerificationChallenge("");
+    setMessage(
+      authStatus === "authenticated"
+        ? "Loading your private profile…"
+        : "Sign in to load your private profile.",
+    );
+    if (authStatus !== "authenticated") return undefined;
     let active = true;
     getCurrentUser()
       .then(async (profile) => ({
@@ -349,7 +381,7 @@ export function AccountSettingsPage() {
     return () => {
       active = false;
     };
-  }, [authStatus]);
+  }, [authStatus, authenticatedUser?.userId]);
 
   if (authStatus !== "authenticated")
     return (
@@ -371,7 +403,7 @@ export function AccountSettingsPage() {
         </section>
       </main>
     );
-  if (!user)
+  if (!user || user.userId !== authenticatedUser?.userId)
     return (
       <main className="auth-page page-shell">
         <section className="auth-panel">

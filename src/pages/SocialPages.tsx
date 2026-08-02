@@ -178,6 +178,12 @@ export function InsightsPage() {
   const [access, setAccess] = useState<PostAccess>("Public");
   const [editing, setEditing] = useState<string>();
   const [message, setMessage] = useState("Loading community insights…");
+  const canPublish = Boolean(
+    status === "authenticated" &&
+    (user?.capabilities?.includes("social:posts:write") ||
+      ["KOL", "Developer"].includes(user?.accountType ?? "") ||
+      ["KOL", "Developer", "Creator", "Admin"].includes(user?.role ?? "")),
+  );
   async function refresh() {
     setPosts(await getPosts({ limit: 30, offset: 0 }));
     setMessage("");
@@ -189,6 +195,12 @@ export function InsightsPage() {
     event.preventDefault();
     if (status !== "authenticated") {
       login();
+      return;
+    }
+    if (!canPublish) {
+      setMessage(
+        "Publishing is available to verified KOL and developer accounts.",
+      );
       return;
     }
     try {
@@ -225,41 +237,63 @@ export function InsightsPage() {
           access never affects organic rank.
         </p>
       </div>
-      <form className="settings-card post-composer" onSubmit={submit}>
-        <h2>{editing ? "Edit insight" : "Publish an insight"}</h2>
-        <label>
-          Content
-          <textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            maxLength={4000}
-            required
-          />
-        </label>
-        <div className="form-row">
+      {canPublish ? (
+        <form className="settings-card post-composer" onSubmit={submit}>
+          <h2>{editing ? "Edit insight" : "Publish an insight"}</h2>
           <label>
-            Project ID (optional)
-            <input
-              value={tokenId}
-              onChange={(event) => setTokenId(event.target.value)}
-              disabled={Boolean(editing)}
+            Content
+            <textarea
+              value={content}
+              onChange={(event) => setContent(event.target.value)}
+              maxLength={4000}
+              required
             />
           </label>
-          <label>
-            Access
-            <select
-              value={access}
-              onChange={(event) => setAccess(event.target.value as PostAccess)}
+          <div className="form-row">
+            <label>
+              Project ID (optional)
+              <input
+                value={tokenId}
+                onChange={(event) => setTokenId(event.target.value)}
+                disabled={Boolean(editing)}
+              />
+            </label>
+            <label>
+              Access
+              <select
+                value={access}
+                onChange={(event) =>
+                  setAccess(event.target.value as PostAccess)
+                }
+              >
+                <option>Public</option>
+                <option>Subscribers</option>
+              </select>
+            </label>
+          </div>
+          <button className="button button-primary" type="submit">
+            {editing ? "Save changes" : "Publish"}
+          </button>
+        </form>
+      ) : (
+        <section className="settings-card post-composer">
+          <h2>Publish an insight</h2>
+          <p>
+            {status === "authenticated"
+              ? "Publishing is available to verified KOL and developer accounts."
+              : "Connect your account to check whether you can publish insights."}
+          </p>
+          {status !== "authenticated" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={login}
             >
-              <option>Public</option>
-              <option>Subscribers</option>
-            </select>
-          </label>
-        </div>
-        <button className="button button-primary" type="submit">
-          {editing ? "Save changes" : "Publish"}
-        </button>
-      </form>
+              Connect with Privy
+            </button>
+          )}
+        </section>
+      )}
       {message && <p className="form-status">{message}</p>}
       <div className="post-list">
         {posts.map((post) => (
