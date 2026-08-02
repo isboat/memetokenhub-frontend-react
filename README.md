@@ -121,6 +121,12 @@ The Social Service client implements legacy user follow aliases, followers/follo
 
 Token detail pages use Social Service—not Token Service—for community writes. `/community` displays reputation leaderboards, `/network` displays the authenticated user's tracked targets and personalized feed, `/insights` provides content discovery and KOL/developer publishing, and public profile pages compose follower, following, reputation, and activity reads. The internal-only `POST /api/social/activities` endpoint is intentionally not exposed to browser code.
 
+### Claim Service feature coverage
+
+The Claim Service client covers private claim submission and owner history, moderator pending and reviewed queues, approve/reject decisions with required notes, one-time rejected-claim appeals, public redacted status, and restricted signed evidence uploads. The browser accepts only PNG, JPEG, WebP, and PDF evidence up to 10 MB, uploads it directly to signed storage, and stores only the returned object reference.
+
+Authenticated users can use `/claims` for `ProjectOwnership`, `SocialIdentity`, and `OfficialRepresentative` verification workflows. Moderators with the `claims:review` capability use `/moderation/claims`; `/claims/:claimId/status` is the optional-auth public badge surface and intentionally cannot render proof fields, attachments, reviewer identity, or reviewer notes. Backend state transitions, claimant/project validation, evidence scanning, appeal uniqueness, concurrency, and approval events remain authoritative in Claim Service.
+
 ## Continuous integration and deployment
 
 ### Main deployment

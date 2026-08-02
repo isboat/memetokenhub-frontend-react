@@ -20,6 +20,11 @@ import {
   InsightsPage,
   MySocialPage,
 } from "./pages/SocialPages";
+import {
+  ClaimCenterPage,
+  ModeratorClaimsPage,
+  PublicClaimStatusPage,
+} from "./pages/ClaimPages";
 
 export default function App() {
   return (
@@ -38,6 +43,12 @@ export default function App() {
         <Route path="/profile/:userId" element={<PublicUserProfilePage />} />
         <Route path="/admin/users" element={<RoleAdministrationPage />} />
         <Route path="/projects/manage" element={<ProjectManagementPage />} />
+        <Route path="/claims" element={<ClaimCenterPage />} />
+        <Route
+          path="/claims/:claimId/status"
+          element={<PublicClaimStatusPage />}
+        />
+        <Route path="/moderation/claims" element={<ModeratorClaimsPage />} />
         <Route path="/token/:tokenId" element={<TokenDetailsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

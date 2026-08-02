@@ -36,6 +36,16 @@ import {
   updateToken,
   uploadProjectMedia,
 } from "./services/tokenService";
+import {
+  appealClaim,
+  getPendingClaims,
+  getPublicClaimStatus,
+  getReviewedClaims,
+  getUserClaims,
+  reviewClaim,
+  submitClaim,
+  uploadClaimAttachment,
+} from "./services/claimService";
 
 function renderApplication(initialRoute = "/") {
   return render(
@@ -397,5 +407,115 @@ describe("MemeTokenHub application", () => {
       "POST",
       "POST",
     ]);
+  });
+
+  it("builds every Claim Service read and state-transition request", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+
+    await getUserClaims("user / 1");
+    await getPendingClaims();
+    await getReviewedClaims({
+      status: "Approved",
+      reviewerId: "mod-1",
+      limit: 10,
+      offset: 5,
+    });
+    fetchMock.mockImplementation(
+      async () =>
+        new Response(JSON.stringify({ claimId: "claim-1" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    await submitClaim({
+      tokenId: "token-1",
+      type: "ProjectOwnership",
+      description: "I control the project contract and official website.",
+      attachments: ["https://objects.example/evidence.pdf"],
+      proofFields: { proofMethod: "DnsSiteProof", siteProof: "mth-proof" },
+    });
+    await reviewClaim("claim-1", "Approved", "Signature verified");
+    await appealClaim("claim-1", {
+      reason: "New evidence is available for moderator review.",
+      proofFields: { walletTx: "tx-2" },
+      attachments: [],
+    });
+    await getPublicClaimStatus("claim-1");
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/claims/user%20%2F%201",
+      "https://api.example.com/api/claims/pending",
+      "https://api.example.com/api/claims/reviewed?limit=10&offset=5&status=Approved&reviewerId=mod-1",
+      "https://api.example.com/api/claims",
+      "https://api.example.com/api/claims/claim-1/review",
+      "https://api.example.com/api/claims/claim-1/appeal",
+      "https://api.example.com/api/claims/claim-1/public-status",
+    ]);
+    expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      "POST",
+      "PUT",
+      "POST",
+      undefined,
+    ]);
+    for (const [, options] of fetchMock.mock.calls)
+      expect(new Headers(options?.headers).get("Authorization")).toBe(
+        "Bearer platform-jwt",
+      );
+  });
+
+  it("validates claim evidence before requesting a signed upload", async () => {
+    await expect(
+      uploadClaimAttachment(
+        new File(["unsafe"], "proof.svg", { type: "image/svg+xml" }),
+      ),
+    ).rejects.toThrow("PNG, JPEG, WebP, or PDF");
+    await expect(
+      uploadClaimAttachment(
+        new File([new Uint8Array(10 * 1024 * 1024 + 1)], "proof.pdf", {
+          type: "application/pdf",
+        }),
+      ),
+    ).rejects.toThrow("10 MB or smaller");
+  });
+
+  it("renders only the redacted public claim status fields", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          claimId: "claim-1",
+          userId: "user-1",
+          tokenId: "token-1",
+          type: "ProjectOwnership",
+          status: "Approved",
+          reviewedAt: "2026-08-01T12:00:00Z",
+          proofFields: { walletTx: "private-transaction" },
+          reviewNotes: "private moderator note",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    renderApplication("/claims/claim-1/status");
+    expect(
+      await screen.findByRole("heading", {
+        name: "Verified project relationship",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("token-1")).toBeInTheDocument();
+    expect(screen.queryByText("private-transaction")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("private moderator note"),
+    ).not.toBeInTheDocument();
   });
 });

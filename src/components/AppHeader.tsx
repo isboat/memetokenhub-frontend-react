@@ -9,6 +9,7 @@ const navigationItems = [
   { label: "Insights", to: "/insights" },
   { label: "People", to: "/people" },
   { label: "Launch", to: "/projects/manage" },
+  { label: "Verify", to: "/claims" },
   { label: "Learn", to: "/learn" },
 ];
 
