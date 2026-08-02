@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { AppHeader } from "./components/AppHeader";
 import { Footer } from "./components/Footer";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { DiscoverPage } from "./pages/DiscoverPage";
 import {
   DashboardPage,
@@ -38,6 +39,7 @@ export default function App() {
   return (
     <div className="app">
       <AppHeader />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<DiscoverPage />} />
         <Route path="/community" element={<CommunityNetworkPage />} />

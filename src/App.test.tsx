@@ -1,4 +1,10 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -165,6 +171,33 @@ describe("MemeTokenHub application", () => {
           .getAllByRole("link", { name })
           .some((link) => link.getAttribute("href") === href),
       ).toBe(true);
+  });
+
+  it("scrolls to the top when a footer link opens another page", async () => {
+    const scrollTo = vi
+      .spyOn(window, "scrollTo")
+      .mockImplementation(() => undefined);
+    const testUser = userEvent.setup();
+    renderApplication("/about");
+    scrollTo.mockClear();
+
+    await testUser.click(
+      within(screen.getByRole("contentinfo")).getByRole("link", {
+        name: "Terms of use",
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Clear rules keep the culture fun.",
+      }),
+    ).toBeInTheDocument();
+    expect(scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
   });
 
   it("routes follow actions through the sign-in dashboard", async () => {

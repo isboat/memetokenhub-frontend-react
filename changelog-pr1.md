@@ -4,7 +4,7 @@
 
 This document records the complete frontend implementation delivered by the first MemeTokenHub frontend pull request. The change set transforms the repository from its initial placeholder into a runnable, typed, tested, responsive React single-page application with authentication, six backend-domain clients, user and moderator workflows, CI/CD, Azure Static Web Apps deployment configuration, and detailed project documentation.
 
-The changelog covers the cumulative changes from the initial repository state and includes the follow-up corrections and informational pages added during review. The PR adds or updates 53 tracked paths and introduces more than 35,000 lines, most of which are the reproducible npm lockfile and the application source/styles.
+The changelog covers the cumulative changes from the initial repository state and includes the follow-up corrections and informational pages added during review. The PR adds or updates 54 tracked paths and introduces more than 35,000 lines, most of which are the reproducible npm lockfile and the application source/styles.
 
 ## Implementation timeline
 
@@ -61,6 +61,7 @@ The cumulative PR was built through the following commits before this changelog 
 - Added a collapsible mobile menu with the same primary destinations.
 - Added footer navigation for public exploration, company/trust information, notifications, payments and access, verification, and community channels.
 - Added explicit “Demo data” and “Preview mode” labels so illustrative market figures are never represented as live data.
+- Added route-aware scroll restoration so client-side page links open at the top rather than retaining the footer scroll position; valid fragment links still scroll to their target element.
 
 ### Responsive design system
 
@@ -358,7 +359,7 @@ Internal `POST /api/notifications/send` is intentionally absent from browser cod
 
 ### Covered behavior
 
-The 26-test suite covers:
+The 27-test suite covers:
 
 1. Main discovery rendering.
 2. Server-backed token search filtering.
@@ -386,6 +387,7 @@ The 26-test suite covers:
 24. FAQ page routing and legal/company footer navigation.
 25. Privacy Policy routing and legal/company footer navigation.
 26. Terms of Use routing and legal/company footer navigation.
+27. Page-top restoration when footer navigation changes the client-side route.
 
 ## Tooling and build configuration
 
@@ -573,6 +575,7 @@ The PR includes the following review-driven corrections in addition to the initi
 - `src/components/AuthButton.tsx` — authentication status control.
 - `src/components/Footer.tsx` — global footer and shortcuts.
 - `src/components/PlatformSessionPanel.tsx` — shared protected-route session states.
+- `src/components/ScrollToTop.tsx` — page-top and fragment scroll restoration after client-side navigation.
 - `src/components/TokenCard.tsx` — discovery project card.
 - `src/components/TokenSocialPanel.tsx` — token engagement, follows, support, comments, and votes.
 
