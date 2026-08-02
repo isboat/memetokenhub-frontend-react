@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -23,6 +23,7 @@ import {
   publishToken,
   requestMediaUpload,
   updateToken,
+  uploadProjectMedia,
 } from "./services/tokenService";
 
 function renderApplication(initialRoute = "/") {
@@ -55,11 +56,40 @@ describe("MemeTokenHub application", () => {
   });
 
   it("filters token cards by a search term", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (request) => {
+      const url = String(request);
+      const payload = url.endsWith("/api/tokens/networks")
+        ? []
+        : url.includes("search=bonk")
+          ? [
+              {
+                tokenId: "bonk",
+                name: "Bonk",
+                symbol: "BONK",
+                description: "Community coin",
+                network: "Solana",
+                status: "Featured",
+                launchStatus: "Published",
+                community: { supportersCount: 10, sentimentScore: 90 },
+              },
+            ]
+          : [];
+      return new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
     const user = userEvent.setup();
     renderApplication();
     await user.type(
       screen.getByPlaceholderText("Search projects or symbols"),
       "bonk",
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText("Live Token Service discovery."),
+      ).toBeInTheDocument(),
     );
     expect(screen.getByRole("heading", { name: /Bonk/ })).toBeInTheDocument();
     expect(
@@ -253,5 +283,42 @@ describe("MemeTokenHub application", () => {
       "POST",
       "POST",
     ]);
+  });
+
+  it("normalizes paginated token lists and avoids an empty query suffix", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [{ tokenId: "token-1" }],
+          limit: 20,
+          offset: 0,
+          total: 1,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    await expect(listTokens()).resolves.toEqual([{ tokenId: "token-1" }]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/api/tokens",
+      expect.anything(),
+    );
+  });
+
+  it("rejects unsupported and oversized project media before requesting a signed URL", async () => {
+    await expect(
+      uploadProjectMedia(
+        new File(["text"], "logo.txt", { type: "text/plain" }),
+        "Logo",
+      ),
+    ).rejects.toThrow("PNG, JPEG, or WebP");
+    await expect(
+      uploadProjectMedia(
+        new File([new Uint8Array(5 * 1024 * 1024 + 1)], "logo.png", {
+          type: "image/png",
+        }),
+        "Logo",
+      ),
+    ).rejects.toThrow("5 MB or smaller");
   });
 });

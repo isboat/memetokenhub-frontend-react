@@ -33,6 +33,14 @@ export function ProjectManagementPage() {
     user?.capabilities?.includes("projects:write") ||
     ["Developer", "Creator", "Admin"].includes(user?.role ?? "") ||
     user?.accountType === "Developer";
+  const canPublish = Boolean(
+    selectedId &&
+    draft.logoUrl &&
+    draft.bannerUrl &&
+    draft.websiteUrl &&
+    draft.network &&
+    draft.contractAddress,
+  );
   useEffect(() => {
     if (status === "authenticated" && user)
       getCreatorTokens(user.userId)
@@ -92,8 +100,27 @@ export function ProjectManagementPage() {
       socialLinks: project.socialLinks,
     });
   }
+  function setSocialLink(platform: string, url: string) {
+    setDraft((current) => ({
+      ...current,
+      socialLinks: [
+        ...(current.socialLinks ?? []).filter(
+          (link) => link.platform !== platform,
+        ),
+        ...(url ? [{ platform, url }] : []),
+      ],
+    }));
+  }
   async function save(event: FormEvent) {
     event.preventDefault();
+    const publicUrls = [
+      draft.websiteUrl,
+      ...(draft.socialLinks ?? []).map((link) => link.url),
+    ].filter(Boolean);
+    if (publicUrls.some((url) => !url?.startsWith("https://"))) {
+      setMessage("Official website and social links must use HTTPS.");
+      return;
+    }
     setMessage("Saving draft…");
     try {
       const saved = selectedId
@@ -264,6 +291,35 @@ export function ProjectManagementPage() {
               placeholder="https://"
             />
           </label>
+          <div className="form-row">
+            <label>
+              X community URL
+              <input
+                type="url"
+                value={
+                  draft.socialLinks?.find((link) => link.platform === "X")
+                    ?.url ?? ""
+                }
+                onChange={(event) => setSocialLink("X", event.target.value)}
+                placeholder="https://x.com/…"
+              />
+            </label>
+            <label>
+              Telegram URL
+              <input
+                type="url"
+                value={
+                  draft.socialLinks?.find(
+                    (link) => link.platform === "Telegram",
+                  )?.url ?? ""
+                }
+                onChange={(event) =>
+                  setSocialLink("Telegram", event.target.value)
+                }
+                placeholder="https://t.me/…"
+              />
+            </label>
+          </div>
           <div className="media-inputs">
             <label>
               <ImageUp /> Logo
@@ -295,12 +351,18 @@ export function ProjectManagementPage() {
             <button
               className="button button-primary"
               type="button"
-              disabled={!selectedId}
+              disabled={!canPublish}
               onClick={() => void publish()}
             >
               <Rocket size={16} /> Publish
             </button>
           </div>
+          {!canPublish && selectedId && (
+            <p className="publish-requirements">
+              Add a logo, banner, HTTPS website, network, and contract address
+              before publishing.
+            </p>
+          )}
         </form>
       </div>
     </main>

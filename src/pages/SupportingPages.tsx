@@ -124,22 +124,49 @@ export function TokenDetailsPage() {
   const [analytics, setAnalytics] = useState<TokenAnalytics | null>(null);
   const [sentiment, setSentiment] = useState<TokenSentiment | null>(null);
   const [sentimentWindow, setSentimentWindow] = useState<SentimentWindow>("7d");
+  const [dataNotice, setDataNotice] = useState("Loading live project data…");
   useEffect(() => {
     if (!tokenId) return;
     let active = true;
-    Promise.all([
-      getToken(tokenId),
-      getTokenAnalytics(tokenId),
-      getTokenSentiment(tokenId, sentimentWindow),
-    ])
-      .then(([detail, stats, vibe]) => {
+    getToken(tokenId)
+      .then((detail) => {
         if (active) {
           setProject(detail);
-          setAnalytics(stats);
-          setSentiment(vibe);
+          setDataNotice("Live canonical project data.");
         }
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (active)
+          setDataNotice("Project API unavailable; showing preview data.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [tokenId]);
+  useEffect(() => {
+    if (!tokenId) return;
+    let active = true;
+    getTokenAnalytics(tokenId)
+      .then((stats) => {
+        if (active) setAnalytics(stats);
+      })
+      .catch(() => {
+        if (active) setAnalytics(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [tokenId]);
+  useEffect(() => {
+    if (!tokenId) return;
+    let active = true;
+    getTokenSentiment(tokenId, sentimentWindow)
+      .then((vibe) => {
+        if (active) setSentiment(vibe);
+      })
+      .catch(() => {
+        if (active) setSentiment(null);
+      });
     return () => {
       active = false;
     };
@@ -164,7 +191,8 @@ export function TokenDetailsPage() {
         </div>
         <div>
           <span className="eyebrow purple">
-            <BadgeCheck size={14} /> Verified project
+            <BadgeCheck size={14} />{" "}
+            {project?.launchStatus ?? "Preview project"}
           </span>
           <h1>
             {project?.name ?? token.name}{" "}
@@ -185,6 +213,7 @@ export function TokenDetailsPage() {
           </div>
         </div>
       </div>
+      <p className="data-source-note">{dataNotice}</p>
       <div className="detail-stats">
         <article>
           <span>Live price</span>

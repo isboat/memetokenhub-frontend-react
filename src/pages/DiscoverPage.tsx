@@ -10,13 +10,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { TokenCard } from "../components/TokenCard";
 import { communityLeaders, memeTokens, networks } from "../data/mockData";
 import {
   getNetworks,
   getTokenFeed,
+  listTokens,
   type TokenProject,
 } from "../services/tokenService";
 import type { MemeToken } from "../types";
@@ -61,15 +62,13 @@ export function DiscoverPage() {
   );
   useEffect(() => {
     let active = true;
-    Promise.all([getTokenFeed("trending", 12), getNetworks()])
-      .then(([projects, supported]) => {
+    getNetworks()
+      .then((supported) => {
         if (active) {
-          setTokens(projects.map(projectToCard));
           setNetworkOptions([
             "All networks",
             ...supported.map((item) => item.network),
           ]);
-          setFeedNotice("Live Token Service discovery.");
         }
       })
       .catch(() => undefined);
@@ -77,20 +76,44 @@ export function DiscoverPage() {
       active = false;
     };
   }, []);
-  const visibleTokens = useMemo(
-    () =>
-      tokens.filter((token) => {
-        const matchesSearch = `${token.name} ${token.symbol}`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        return (
-          matchesSearch &&
-          (selectedNetwork === "All networks" ||
-            token.network === selectedNetwork)
-        );
-      }),
-    [searchTerm, selectedNetwork, tokens],
-  );
+  useEffect(() => {
+    let active = true;
+    setFeedNotice("Loading live Token Service discovery…");
+    const timeout = window.setTimeout(() => {
+      const request =
+        searchTerm.trim() || selectedNetwork !== "All networks"
+          ? listTokens({
+              search: searchTerm.trim(),
+              network:
+                selectedNetwork === "All networks"
+                  ? undefined
+                  : selectedNetwork,
+              sortBy: "popularity",
+              limit: 24,
+              offset: 0,
+            })
+          : getTokenFeed("trending", 12);
+      request
+        .then((projects) => {
+          if (active) {
+            setTokens(projects.map(projectToCard));
+            setFeedNotice("Live Token Service discovery.");
+          }
+        })
+        .catch(() => {
+          if (active) {
+            setTokens(memeTokens);
+            setFeedNotice(
+              "Live discovery is unavailable; showing preview data.",
+            );
+          }
+        });
+    }, 300);
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, [searchTerm, selectedNetwork]);
 
   return (
     <>
@@ -210,9 +233,9 @@ export function DiscoverPage() {
             </div>
           </div>
           <p className="data-source-note">{feedNotice}</p>
-          {visibleTokens.length > 0 ? (
+          {tokens.length > 0 ? (
             <div className="token-grid">
-              {visibleTokens.map((token) => (
+              {tokens.map((token) => (
                 <TokenCard key={token.id} token={token} />
               ))}
             </div>

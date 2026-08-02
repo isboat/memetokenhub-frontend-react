@@ -1485,6 +1485,9 @@ button {
   border-color: #5873ef;
   background: #243764;
 }
+.publish-requirements {
+  color: #c89560 !important;
+}
 .public-profile-card p {
   color: #8d99ad;
   line-height: 1.7;

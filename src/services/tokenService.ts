@@ -96,6 +96,10 @@ async function readJson<T>(response: Response): Promise<T> {
     );
   return (await response.json()) as T;
 }
+async function readList<T>(response: Response): Promise<T[]> {
+  const payload = await readJson<T[] | { items: T[] }>(response);
+  return Array.isArray(payload) ? payload : payload.items;
+}
 function queryString(values: object) {
   const query = new URLSearchParams();
   Object.entries(values as Record<string, string | number | undefined>).forEach(
@@ -107,8 +111,9 @@ function queryString(values: object) {
 }
 
 export async function listTokens(filters: TokenListFilters = {}) {
-  return readJson<TokenProject[]>(
-    await gatewayRequest(`/api/tokens?${queryString(filters)}`),
+  const query = queryString(filters);
+  return readList<TokenProject>(
+    await gatewayRequest(`/api/tokens${query ? `?${query}` : ""}`),
   );
 }
 export async function getToken(tokenId: string) {
@@ -138,7 +143,7 @@ export async function updateToken(
   );
 }
 export async function getTokenFeed(type: FeedType, limit = 12) {
-  return readJson<TokenProject[]>(
+  return readList<TokenProject>(
     await gatewayRequest(`/api/tokens/feeds/${type}?limit=${limit}`),
   );
 }
@@ -150,7 +155,7 @@ export async function getTokenAnalytics(tokenId: string) {
   );
 }
 export async function getCreatorTokens(userId: string, limit = 20, offset = 0) {
-  return readJson<TokenProject[]>(
+  return readList<TokenProject>(
     await gatewayRequest(
       `/api/tokens/by-creator/${encodeURIComponent(userId)}?limit=${limit}&offset=${offset}`,
     ),
@@ -197,6 +202,8 @@ export async function uploadProjectMedia(
 ) {
   if (!["image/png", "image/jpeg", "image/webp"].includes(file.type))
     throw new Error("Use a PNG, JPEG, or WebP image.");
+  if (file.size > 5 * 1024 * 1024)
+    throw new Error("Project images must be 5 MB or smaller.");
   const signed = await requestMediaUpload({
     fileName: file.name,
     contentType: file.type,
