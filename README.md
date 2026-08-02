@@ -134,7 +134,8 @@ npm run playwright:install
 ```
 
 Then run the end-to-end smoke tests. Playwright automatically starts the Vite development
-server on port `4173` for the duration of the test run:
+server on port `4173` for the duration of the test run. The regular browser-test command
+excludes screenshot-only scenarios so CI does not create unused visual artifacts:
 
 ```bash
 npm run test:e2e

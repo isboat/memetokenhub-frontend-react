@@ -42,6 +42,7 @@ The cumulative PR was built through the following commits before this changelog 
 - Vitest and Testing Library coverage for the main UI and service contracts.
 - Playwright browser automation with a Chromium smoke test and a repeatable browser/system-dependency installation command.
 - Reproducible Playwright screenshot capture for desktop and mobile visual review.
+- Chromium smoke tests in both GitHub Actions workflows, isolated from opt-in screenshot scenarios.
 - GitHub Actions workflows for pull-request verification and main-branch Azure deployment.
 - A comprehensive README covering setup, architecture, service coverage, navigation, roles, routes, CI/CD, and dependency notices.
 - A documentation submodule containing the source product and service specifications.

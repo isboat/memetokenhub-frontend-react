@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 const screenshotDirectory = "artifacts/screenshots";
 
-test("captures the desktop discovery experience", async ({ page }) => {
+test("@screenshots captures the desktop discovery experience", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.getByRole("main")).toBeVisible();
 
@@ -12,7 +14,9 @@ test("captures the desktop discovery experience", async ({ page }) => {
   });
 });
 
-test("captures the mobile discovery experience", async ({ page }) => {
+test("@screenshots captures the mobile discovery experience", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(page.getByRole("main")).toBeVisible();
@@ -23,7 +27,7 @@ test("captures the mobile discovery experience", async ({ page }) => {
   });
 });
 
-test("captures the desktop about page", async ({ page }) => {
+test("@screenshots captures the desktop about page", async ({ page }) => {
   await page.goto("/about");
   await expect(
     page.getByRole("heading", {
