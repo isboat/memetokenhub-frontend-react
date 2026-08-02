@@ -144,3 +144,8 @@ vite.config.ts.timestamp-*
 
 # Local visual review artifacts
 artifacts/
+
+# Playwright test output
+playwright-report/
+test-results/
+blob-report/

@@ -110,16 +110,34 @@ Vite prints the local development URL, normally `http://localhost:5173`.
 
 ## Available scripts
 
-| Command                 | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `npm run dev`           | Start the Vite development server.                     |
-| `npm run build`         | Type-check and create an optimized production build.   |
-| `npm run preview`       | Preview the production build locally.                  |
-| `npm run lint`          | Run static analysis with warnings treated as failures. |
-| `npm test`              | Run the test suite once.                               |
-| `npm run test:coverage` | Run tests and generate coverage output.                |
-| `npm run format`        | Format supported project files.                        |
-| `npm run format:check`  | Check formatting without changing files.               |
+| Command                      | Purpose                                                |
+| ---------------------------- | ------------------------------------------------------ |
+| `npm run dev`                | Start the Vite development server.                     |
+| `npm run build`              | Type-check and create an optimized production build.   |
+| `npm run preview`            | Preview the production build locally.                  |
+| `npm run lint`               | Run static analysis with warnings treated as failures. |
+| `npm test`                   | Run the test suite once.                               |
+| `npm run test:e2e`           | Run the Playwright browser tests in Chromium.          |
+| `npm run test:coverage`      | Run tests and generate coverage output.                |
+| `npm run playwright:install` | Install Chromium and its required OS packages.         |
+| `npm run format`             | Format supported project files.                        |
+| `npm run format:check`       | Check formatting without changing files.               |
+
+### Browser testing with Playwright
+
+Playwright and its Chromium browser target are included as development tooling. On a new
+machine or CI runner, install the browser binary and Linux system dependencies once:
+
+```bash
+npm run playwright:install
+```
+
+Then run the end-to-end smoke tests. Playwright automatically starts the Vite development
+server on port `4173` for the duration of the test run:
+
+```bash
+npm run test:e2e
+```
 
 ## Routes
 

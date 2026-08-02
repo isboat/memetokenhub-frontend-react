@@ -40,6 +40,7 @@ The cumulative PR was built through the following commits before this changelog 
 - Signed media/evidence upload flows with client-side file validation.
 - Security boundaries that keep internal webhooks, notification delivery, private claim evidence, and backend-authoritative state out of browser control.
 - Vitest and Testing Library coverage for the main UI and service contracts.
+- Playwright browser automation with a Chromium smoke test and a repeatable browser/system-dependency installation command.
 - GitHub Actions workflows for pull-request verification and main-branch Azure deployment.
 - A comprehensive README covering setup, architecture, service coverage, navigation, roles, routes, CI/CD, and dependency notices.
 - A documentation submodule containing the source product and service specifications.
@@ -48,6 +49,7 @@ The cumulative PR was built through the following commits before this changelog 
 
 - Replaced the original one-line README with full user, developer, architecture, and deployment documentation.
 - Expanded `.gitignore` for local visual-review artifacts.
+- Expanded `.gitignore` for generated Playwright reports, traces, and test results.
 - Iteratively corrected authentication exchange failure states, token integration behavior, claim privacy, appeal evidence, payment cancellation semantics, notification preference stability, URL safety, and accessibility based on review feedback.
 
 ## Product experience
