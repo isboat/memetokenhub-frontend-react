@@ -43,6 +43,15 @@ function date(value?: string) {
     : "—";
 }
 
+function secureExternalUrl(value?: string) {
+  if (!value) return undefined;
+  try {
+    return new URL(value).protocol === "https:" ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function PaymentSignIn() {
   const { errorMessage, login, logout, retryExchange, status } = useAuth();
   const busy = status === "loading" || status === "exchanging";
@@ -223,7 +232,7 @@ export function PaymentsPage() {
       setEntitlements((current) =>
         current.map((item) =>
           item.entitlementId === entitlement.entitlementId
-            ? { ...item, renews: false, status: "Cancelled" }
+            ? { ...item, renews: false }
             : item,
         ),
       );
@@ -430,8 +439,11 @@ export function PaymentsPage() {
                 <small>{date(payment.createdAt)}</small>
               </div>
               <strong>{money(payment.amount, payment.currency)}</strong>
-              {payment.receiptUrl ? (
-                <a href={payment.receiptUrl} rel="noopener noreferrer">
+              {secureExternalUrl(payment.receiptUrl) ? (
+                <a
+                  href={secureExternalUrl(payment.receiptUrl)}
+                  rel="noopener noreferrer"
+                >
                   Receipt <ExternalLink size={14} />
                 </a>
               ) : (

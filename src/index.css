@@ -2471,7 +2471,21 @@ button {
 .notification-item a {
   color: #91a5ff;
 }
-.notification-item > i {
+.notification-read-action {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.notification-read-action:hover,
+.notification-read-action:focus-visible {
+  background: #1d2a48;
+}
+.notification-read-action i {
   width: 8px;
   height: 8px;
   border-radius: 50%;

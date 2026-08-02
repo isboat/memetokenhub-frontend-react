@@ -610,10 +610,22 @@ describe("MemeTokenHub application", () => {
       .mockImplementation(async (_url, options) =>
         options?.method === "DELETE"
           ? new Response(null, { status: 204 })
-          : new Response(JSON.stringify([]), {
-              status: 200,
-              headers: { "Content-Type": "application/json" },
-            }),
+          : options?.method === "POST"
+            ? new Response(
+                JSON.stringify({
+                  checkoutUrl: "https://checkout.hel.io/session-1",
+                  amount: 5,
+                  currency: "USD",
+                }),
+                {
+                  status: 200,
+                  headers: { "Content-Type": "application/json" },
+                },
+              )
+            : new Response(JSON.stringify([]), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              }),
       );
     await startTokenCheckout({
       userId: "user-1",
@@ -657,6 +669,23 @@ describe("MemeTokenHub application", () => {
     ).toBe(false);
   });
 
+  it("rejects unsafe payment-provider checkout URLs", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          checkoutUrl: "javascript:alert('unsafe')",
+          amount: 5,
+          currency: "USD",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    await expect(
+      startTokenCheckout({ userId: "user-1", tokenId: "token-1", amount: 5 }),
+    ).rejects.toThrow("invalid checkout URL");
+  });
+
   it("builds subject-derived and compatibility Notification Service requests", async () => {
     vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
     setPlatformJwt("platform-jwt");
@@ -668,7 +697,7 @@ describe("MemeTokenHub application", () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
       .mockImplementation(async (url, options) => {
-        if (String(url).endsWith("/read-all"))
+        if (String(url).endsWith("/read-all") || String(url).endsWith("/read"))
           return new Response(null, { status: 204 });
         return new Response(
           JSON.stringify(options?.method === "PUT" ? preferences : []),
@@ -704,5 +733,61 @@ describe("MemeTokenHub application", () => {
     expect(
       fetchMock.mock.calls.some(([url]) => String(url).endsWith("/send")),
     ).toBe(false);
+  });
+
+  it("does not reset notification preferences when the unread filter changes", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const preferences: NotificationPreferences = {
+      channels: { InApp: true, Email: true, Push: false },
+      events: {},
+      digestFrequency: "Weekly",
+    };
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(
+        async (request) =>
+          new Response(
+            JSON.stringify(
+              String(request).endsWith("/me/preferences") ? preferences : [],
+            ),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+      );
+    const authenticatedContext: AuthContextValue = {
+      status: "authenticated",
+      user: { userId: "user-1" },
+      errorMessage: null,
+      login: vi.fn(),
+      logout: vi.fn(async () => undefined),
+      retryExchange: vi.fn(),
+    };
+    const testUser = userEvent.setup();
+    render(
+      <AuthContext.Provider value={authenticatedContext}>
+        <MemoryRouter initialEntries={["/notifications"]}>
+          <App />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.filter(([url]) =>
+          String(url).endsWith("/me/preferences"),
+        ),
+      ).toHaveLength(1),
+    );
+    await testUser.click(screen.getByRole("checkbox", { name: "Unread only" }));
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(([url]) =>
+          String(url).includes("unreadOnly=true"),
+        ),
+      ).toBe(true),
+    );
+    expect(
+      fetchMock.mock.calls.filter(([url]) =>
+        String(url).endsWith("/me/preferences"),
+      ),
+    ).toHaveLength(1);
   });
 });

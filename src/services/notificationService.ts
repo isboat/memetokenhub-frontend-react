@@ -120,7 +120,7 @@ export async function updateMyNotificationPreferences(
 }
 
 export async function markNotificationRead(notificationId: string) {
-  return parse<HubNotification>(
+  await parse<void>(
     await gatewayRequest(
       `/api/notifications/${encodeURIComponent(notificationId)}/read`,
       put(),

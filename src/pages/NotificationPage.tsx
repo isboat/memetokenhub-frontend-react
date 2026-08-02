@@ -43,6 +43,10 @@ function title(value: string) {
   return value.replace(/([A-Z])/g, " $1").trim();
 }
 
+function safeAppPath(value?: string) {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : undefined;
+}
+
 export function NotificationPage() {
   const { errorMessage, status, login, logout, retryExchange } = useAuth();
   const [notifications, setNotifications] = useState<HubNotification[]>([]);
@@ -53,23 +57,46 @@ export function NotificationPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    let active = true;
     if (status === "authenticated")
-      Promise.all([
-        getMyNotifications(unreadOnly),
-        getMyNotificationPreferences(),
-      ])
-        .then(([items, saved]) => {
-          setNotifications(items);
-          setPreferences(saved);
+      getMyNotifications(unreadOnly)
+        .then((items) => {
+          if (active) setNotifications(items);
         })
-        .catch((error: unknown) =>
-          setMessage(
-            error instanceof Error
-              ? error.message
-              : "Notifications could not be loaded.",
-          ),
+        .catch(
+          (error: unknown) =>
+            active &&
+            setMessage(
+              error instanceof Error
+                ? error.message
+                : "Notifications could not be loaded.",
+            ),
         );
+    return () => {
+      active = false;
+    };
   }, [status, unreadOnly]);
+
+  useEffect(() => {
+    let active = true;
+    if (status === "authenticated")
+      getMyNotificationPreferences()
+        .then((saved) => {
+          if (active) setPreferences(saved);
+        })
+        .catch(
+          (error: unknown) =>
+            active &&
+            setMessage(
+              error instanceof Error
+                ? error.message
+                : "Notification preferences could not be loaded.",
+            ),
+        );
+    return () => {
+      active = false;
+    };
+  }, [status]);
 
   if (status !== "authenticated") {
     const loading = status === "loading" || status === "exchanging";
@@ -120,11 +147,11 @@ export function NotificationPage() {
   async function read(item: HubNotification) {
     if (item.isRead) return;
     try {
-      const updated = await markNotificationRead(item.notificationId);
+      await markNotificationRead(item.notificationId);
       setNotifications((current) =>
         current.map((entry) =>
           entry.notificationId === item.notificationId
-            ? { ...entry, ...updated, isRead: true }
+            ? { ...entry, isRead: true, readAt: new Date().toISOString() }
             : entry,
         ),
       );
@@ -321,7 +348,6 @@ export function NotificationPage() {
                 item.isRead ? "notification-item" : "notification-item unread"
               }
               key={item.notificationId}
-              onClick={() => void read(item)}
             >
               <span className="notification-icon">
                 <Bell size={18} />
@@ -336,11 +362,22 @@ export function NotificationPage() {
                   </time>
                 </div>
                 <p>{item.message}</p>
-                {item.actionUrl && (
-                  <Link to={item.actionUrl}>View details</Link>
+                {safeAppPath(item.actionUrl) && (
+                  <Link to={safeAppPath(item.actionUrl) ?? "/"}>
+                    View details
+                  </Link>
                 )}
               </div>
-              {!item.isRead && <i aria-label="Unread" />}
+              {!item.isRead && (
+                <button
+                  className="notification-read-action"
+                  type="button"
+                  aria-label={`Mark ${item.title ?? title(item.type)} as read`}
+                  onClick={() => void read(item)}
+                >
+                  <i aria-hidden="true" />
+                </button>
+              )}
             </article>
           ))}
         </div>

@@ -89,13 +89,24 @@ function post(value: unknown): RequestInit {
   };
 }
 
+function validateCheckoutSession(session: CheckoutSession) {
+  try {
+    if (new URL(session.checkoutUrl).protocol !== "https:") throw new Error();
+  } catch {
+    throw new Error("The payment provider returned an invalid checkout URL.");
+  }
+  return session;
+}
+
 export async function startTokenCheckout(input: {
   userId: string;
   tokenId: string;
   amount: number;
 }) {
-  return parse<CheckoutSession>(
-    await gatewayRequest("/api/payments/checkout", post(input)),
+  return validateCheckoutSession(
+    await parse<CheckoutSession>(
+      await gatewayRequest("/api/payments/checkout", post(input)),
+    ),
   );
 }
 
@@ -113,8 +124,10 @@ export async function startCreatorCheckout(input: {
   amount: number;
   currency: string;
 }) {
-  return parse<CheckoutSession>(
-    await gatewayRequest("/api/payments/creator-checkout", post(input)),
+  return validateCheckoutSession(
+    await parse<CheckoutSession>(
+      await gatewayRequest("/api/payments/creator-checkout", post(input)),
+    ),
   );
 }
 
