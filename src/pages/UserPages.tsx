@@ -22,6 +22,16 @@ import {
   verifySocialChannel,
   verifyWallet,
 } from "../services/userService";
+import {
+  followUser,
+  getActivities,
+  getFollowers,
+  getFollowing,
+  getReputation,
+  type Activity,
+  type Reputation,
+  unfollowUser,
+} from "../services/socialService";
 
 function StatusMessage({
   message,
@@ -161,20 +171,48 @@ export function PeopleDirectoryPage() {
 
 export function PublicUserProfilePage() {
   const { userId = "" } = useParams();
+  const { status: authStatus, login } = useAuth();
   const [profile, setProfile] = useState<PlatformUser | null>(null);
   const [channels, setChannels] = useState<SocialChannel[]>([]);
   const [message, setMessage] = useState("Loading public profile…");
+  const [reputation, setReputation] = useState<Reputation>();
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     let active = true;
-    Promise.all([getUser(userId), getSocialChannels(userId)])
-      .then(([loadedProfile, loadedChannels]) => {
-        if (active) {
-          setProfile(loadedProfile);
-          setChannels(loadedChannels);
-          setMessage("");
-        }
-      })
+    Promise.all([
+      getUser(userId),
+      getSocialChannels(userId),
+      getReputation(userId),
+      getActivities(userId, 10, 0),
+      getFollowers(userId, 1, 0),
+      getFollowing(userId, 1, 0),
+    ])
+      .then(
+        ([
+          loadedProfile,
+          loadedChannels,
+          loadedReputation,
+          loadedActivities,
+          followers,
+          following,
+        ]) => {
+          if (active) {
+            setProfile(loadedProfile);
+            setChannels(loadedChannels);
+            setMessage("");
+            setReputation(loadedReputation);
+            setActivities(loadedActivities);
+            setFollowerCount(
+              loadedReputation.followersCount ?? followers.length,
+            );
+            setFollowingCount(following.length);
+          }
+        },
+      )
       .catch((error: unknown) => {
         if (active)
           setMessage(
@@ -215,16 +253,43 @@ export function PublicUserProfilePage() {
           </p>
           <div className="profile-metrics">
             <span>
-              <strong>{profile.profile?.followerCount ?? 0}</strong> followers
+              <strong>{followerCount}</strong> followers
+            </span>
+            <span>
+              <strong>{followingCount}</strong> following
             </span>
             <span>
               <strong>{profile.profile?.projectsCount ?? 0}</strong> projects
             </span>
             <span>
-              <strong>{profile.profile?.reputationScore ?? 0}</strong>{" "}
+              <strong>
+                {reputation?.score ?? profile.profile?.reputationScore ?? 0}
+              </strong>{" "}
               reputation
             </span>
           </div>
+          <button
+            className="button button-primary compact"
+            type="button"
+            onClick={() => {
+              if (authStatus !== "authenticated") {
+                login();
+                return;
+              }
+              const action = isFollowing
+                ? unfollowUser(userId)
+                : followUser(userId);
+              action
+                .then(() => setIsFollowing((value) => !value))
+                .catch((error: unknown) =>
+                  setMessage(
+                    error instanceof Error ? error.message : "Follow failed.",
+                  ),
+                );
+            }}
+          >
+            {isFollowing ? "Unfollow" : "Follow user"}
+          </button>
           <div className="channel-list">
             {channels.map((channel) => (
               <div key={channel.platform}>
@@ -233,6 +298,15 @@ export function PublicUserProfilePage() {
                 </span>
                 <strong>{channel.verified ? "Verified" : "Connected"}</strong>
               </div>
+            ))}
+          </div>
+          <div className="activity-list">
+            {activities.map((activity) => (
+              <article className="activity-item" key={activity.activityId}>
+                <strong>{activity.type}</strong>
+                <p>{activity.description}</p>
+                <small>{new Date(activity.createdAt).toLocaleString()}</small>
+              </article>
             ))}
           </div>
         </div>

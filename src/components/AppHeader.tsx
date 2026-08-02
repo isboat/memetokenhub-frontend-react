@@ -6,6 +6,7 @@ import { AuthButton } from "./AuthButton";
 const navigationItems = [
   { label: "Discover", to: "/" },
   { label: "Community", to: "/community" },
+  { label: "Insights", to: "/insights" },
   { label: "People", to: "/people" },
   { label: "Launch", to: "/projects/manage" },
   { label: "Learn", to: "/learn" },

@@ -3,7 +3,6 @@ import { AppHeader } from "./components/AppHeader";
 import { Footer } from "./components/Footer";
 import { DiscoverPage } from "./pages/DiscoverPage";
 import {
-  CommunityPage,
   DashboardPage,
   LearnPage,
   NotFoundPage,
@@ -16,6 +15,11 @@ import {
   RoleAdministrationPage,
 } from "./pages/UserPages";
 import { ProjectManagementPage } from "./pages/ProjectManagementPage";
+import {
+  CommunityNetworkPage,
+  InsightsPage,
+  MySocialPage,
+} from "./pages/SocialPages";
 
 export default function App() {
   return (
@@ -23,7 +27,9 @@ export default function App() {
       <AppHeader />
       <Routes>
         <Route path="/" element={<DiscoverPage />} />
-        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/community" element={<CommunityNetworkPage />} />
+        <Route path="/network" element={<MySocialPage />} />
+        <Route path="/insights" element={<InsightsPage />} />
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/about" element={<LearnPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

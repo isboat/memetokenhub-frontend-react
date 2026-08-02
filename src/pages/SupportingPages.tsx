@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth/authContext";
 import { communityLeaders, memeTokens } from "../data/mockData";
 import { TokenCard } from "../components/TokenCard";
+import { TokenSocialPanel } from "../components/TokenSocialPanel";
 import {
   getToken,
   getTokenAnalytics,
@@ -204,12 +205,12 @@ export function TokenDetailsPage() {
             members following the story.
           </p>
           <div className="hero-actions">
-            <button className="button button-primary" type="button">
+            <a className="button button-primary" href="#community-signal">
               Follow project
-            </button>
-            <button className="button button-secondary" type="button">
+            </a>
+            <a className="button button-secondary" href="#community-signal">
               Vote hot 🔥
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -252,6 +253,9 @@ export function TokenDetailsPage() {
             {item}
           </button>
         ))}
+      </div>
+      <div id="community-signal">
+        <TokenSocialPanel tokenId={tokenId ?? token.id} />
       </div>
       <section className="related">
         <h2>More from the hub</h2>

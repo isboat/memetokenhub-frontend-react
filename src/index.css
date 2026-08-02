@@ -1488,6 +1488,125 @@ button {
 .publish-requirements {
   color: #c89560 !important;
 }
+.social-panel {
+  margin-top: 70px;
+  padding-top: 65px;
+  border-top: 1px solid #263249;
+}
+.social-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.social-action-row button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  color: #8f9caf;
+  border: 1px solid #2a374d;
+  border-radius: 10px;
+  background: #0d1522;
+  font-size: 10px;
+  font-weight: 750;
+}
+.social-action-row button svg {
+  width: 15px;
+}
+.social-action-row button.active {
+  color: white;
+  border-color: #5873ef;
+  background: #253a72;
+}
+.social-action-row button.hot {
+  color: #ffad75;
+}
+.social-action-row button.not-hot {
+  color: #ff8996;
+}
+.social-grid,
+.social-dashboard,
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.comment-list,
+.support-list,
+.activity-list,
+.post-list,
+.reputation-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 15px;
+}
+.comment-list article,
+.support-list article,
+.activity-item {
+  padding: 12px;
+  border: 1px solid #243047;
+  border-radius: 10px;
+  background: #0a101b;
+}
+.comment-list p,
+.support-list p,
+.activity-item p {
+  margin: 0 0 5px;
+  color: #a0aabd;
+  font-size: 11px;
+}
+.comment-list small,
+.support-list small,
+.activity-item small,
+.post-list small {
+  color: #647188;
+  font-size: 8px;
+}
+.text-link-button {
+  padding: 7px;
+  color: #91a3ff;
+  border: 0;
+  background: transparent;
+  font-size: 9px;
+  font-weight: 800;
+}
+.reputation-list article {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #253149;
+  border-radius: 12px;
+  background: #0e1522;
+}
+.reputation-list h3 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 12px;
+}
+.reputation-list p {
+  margin: 3px 0 0;
+  color: #7e899c;
+  font-size: 9px;
+}
+.post-composer {
+  max-width: 760px;
+  margin-bottom: 25px;
+}
+.post-list {
+  grid-template-columns: repeat(2, 1fr);
+}
+.post-list article > p {
+  color: #a5afc0;
+  line-height: 1.7;
+}
+.activity-list {
+  margin-top: 25px;
+}
 .public-profile-card p {
   color: #8d99ad;
   line-height: 1.7;
@@ -2224,6 +2343,12 @@ body {
   .project-studio,
   .form-row,
   .media-inputs {
+    grid-template-columns: 1fr;
+  }
+  .social-grid,
+  .social-dashboard,
+  .leaderboard-grid,
+  .post-list {
     grid-template-columns: 1fr;
   }
   .person-result {

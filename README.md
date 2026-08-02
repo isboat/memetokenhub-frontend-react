@@ -115,6 +115,12 @@ The Token Service client covers list/search/filter/sort/pagination, details, det
 
 Developers with `projects:write` can use `/projects/manage` to create and edit drafts, upload validated logo/banner types through signed URLs, and publish completed project homes. Signed upload responses are sent directly to approved object storage; the browser persists only the returned asset URL. The `/token/:tokenId` experience composes canonical detail, analytics, and transparent sentiment reads without mutating Social Service votes or follows.
 
+### Social Service feature coverage
+
+The Social Service client implements legacy user follow aliases, followers/following, personalized and public activity feeds, creator/collector leaderboards, reputation, token likes/comments/engagement, generalized User/Token/Network follows, timestamped KOL support and withdrawal, replaceable Hot/NotHot votes, and public/subscriber-labelled post CRUD and feeds.
+
+Token detail pages use Social Service—not Token Service—for community writes. `/community` displays reputation leaderboards, `/network` displays the authenticated user's tracked targets and personalized feed, `/insights` provides content discovery and KOL/developer publishing, and public profile pages compose follower, following, reputation, and activity reads. The internal-only `POST /api/social/activities` endpoint is intentionally not exposed to browser code.
+
 ## Continuous integration and deployment
 
 ### Main deployment

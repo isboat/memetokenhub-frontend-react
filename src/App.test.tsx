@@ -15,6 +15,17 @@ import {
 } from "./services/userService";
 import { clearPlatformJwt, setPlatformJwt } from "./auth/platformTokenStore";
 import {
+  createPost,
+  followTarget,
+  getFeed,
+  getMyFollows,
+  getPosts,
+  getTokenSupporters,
+  getTokenVote,
+  supportToken,
+  voteOnToken,
+} from "./services/socialService";
+import {
   createToken,
   getCreatorTokens,
   getTokenFeed,
@@ -320,5 +331,71 @@ describe("MemeTokenHub application", () => {
         "Logo",
       ),
     ).rejects.toThrow("5 MB or smaller");
+  });
+
+  it("builds social feed, tracked-target, supporter, vote, and post read requests", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => new Response("[]", { status: 200 }));
+    await getFeed("user-1", 10, 5);
+    await getMyFollows("Token", 20, 0);
+    await getTokenSupporters("token-1", true, 10, 2);
+    fetchMock.mockImplementationOnce(
+      async () =>
+        new Response(JSON.stringify({ hotVotes: 2, notHotVotes: 1 }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    await getTokenVote("token-1");
+    fetchMock.mockImplementationOnce(
+      async () => new Response("[]", { status: 200 }),
+    );
+    await getPosts({
+      authorId: "kol-1",
+      tokenId: "token-1",
+      access: "Public",
+      limit: 10,
+      offset: 0,
+    });
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/social/feed/user-1?limit=10&offset=5",
+      "https://api.example.com/api/social/follows/me?limit=20&offset=0&targetType=Token",
+      "https://api.example.com/api/social/tokens/token-1/supporters?includeWithdrawn=true&limit=10&offset=2",
+      "https://api.example.com/api/social/tokens/token-1/vote",
+      "https://api.example.com/api/social/posts?authorId=kol-1&tokenId=token-1&access=Public&limit=10&offset=0",
+    ]);
+  });
+
+  it("authenticates generalized follows, support, votes, and post writes", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        new Response(JSON.stringify({}), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    await followTarget("Network", "Solana");
+    await supportToken("token-1", "Early support");
+    await voteOnToken("token-1", "Hot");
+    await createPost({
+      tokenId: "token-1",
+      content: "Insight",
+      mediaUrls: [],
+      access: "Public",
+    });
+    for (const [, options] of fetchMock.mock.calls)
+      expect(new Headers(options?.headers).get("Authorization")).toBe(
+        "Bearer platform-jwt",
+      );
+    expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
+      "POST",
+      "POST",
+      "POST",
+      "POST",
+    ]);
   });
 });
