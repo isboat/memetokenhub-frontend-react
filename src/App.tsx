@@ -9,6 +9,12 @@ import {
   NotFoundPage,
   TokenDetailsPage,
 } from "./pages/SupportingPages";
+import {
+  AccountSettingsPage,
+  PeopleDirectoryPage,
+  PublicUserProfilePage,
+  RoleAdministrationPage,
+} from "./pages/UserPages";
 
 export default function App() {
   return (
@@ -20,6 +26,10 @@ export default function App() {
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/about" element={<LearnPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/people" element={<PeopleDirectoryPage />} />
+        <Route path="/profile" element={<AccountSettingsPage />} />
+        <Route path="/profile/:userId" element={<PublicUserProfilePage />} />
+        <Route path="/admin/users" element={<RoleAdministrationPage />} />
         <Route path="/token/:tokenId" element={<TokenDetailsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

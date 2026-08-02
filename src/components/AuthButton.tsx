@@ -1,5 +1,6 @@
 import { LogIn, LogOut, LoaderCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "../auth/authContext";
+import { Link } from "react-router-dom";
 
 export function AuthButton() {
   const { status, user, errorMessage, login, logout, retryExchange } =
@@ -8,13 +9,22 @@ export function AuthButton() {
 
   if (status === "authenticated") {
     return (
-      <button
-        className="button button-secondary compact auth-button"
-        type="button"
-        onClick={() => void logout()}
-      >
-        <LogOut size={15} /> <span>{user?.username ?? "Sign out"}</span>
-      </button>
+      <span className="authenticated-actions">
+        <Link
+          className="button button-secondary compact auth-button"
+          to="/profile"
+        >
+          <span>{user?.username ?? "Profile"}</span>
+        </Link>
+        <button
+          className="icon-button"
+          type="button"
+          aria-label="Sign out"
+          onClick={() => void logout()}
+        >
+          <LogOut size={15} />
+        </button>
+      </span>
     );
   }
 

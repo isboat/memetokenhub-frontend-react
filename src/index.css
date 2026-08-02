@@ -1212,6 +1212,206 @@ button {
   color: #8d99ad;
   line-height: 1.7;
 }
+.authenticated-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.directory-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto auto;
+  align-items: end;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #253149;
+  border-radius: 18px;
+  background: #0e1522;
+}
+.directory-filters label,
+.settings-card label,
+.auth-panel label {
+  display: grid;
+  gap: 7px;
+  color: #9da9bc;
+  font-size: 11px;
+  font-weight: 750;
+  text-align: left;
+}
+.directory-filters input,
+.directory-filters select,
+.settings-card input,
+.settings-card select,
+.settings-card textarea,
+.auth-panel input,
+.auth-panel select {
+  width: 100%;
+  min-height: 43px;
+  padding: 10px 12px;
+  color: #edf1fa;
+  border: 1px solid #2a374e;
+  border-radius: 10px;
+  outline: none;
+  background: #0a101b;
+}
+.settings-card textarea {
+  min-height: 85px;
+  resize: vertical;
+}
+.directory-filters input:focus,
+.directory-filters select:focus,
+.settings-card input:focus,
+.settings-card select:focus,
+.settings-card textarea:focus,
+.auth-panel input:focus,
+.auth-panel select:focus {
+  border-color: #627df4;
+  box-shadow: 0 0 0 3px rgba(82, 113, 255, 0.12);
+}
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  grid-template-columns: auto 1fr;
+}
+.checkbox-label input {
+  width: 16px;
+  min-height: 16px;
+}
+.form-status {
+  margin: 18px 0;
+  color: #79d9ba;
+  font-size: 12px;
+}
+.form-status.error {
+  color: #ff8996;
+}
+.people-results {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+.person-result {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 17px;
+  border: 1px solid #253149;
+  border-radius: 15px;
+  background: #0e1522;
+}
+.person-result h2 {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin: 0;
+  font-size: 14px;
+}
+.person-result h2 svg {
+  color: #7f97ff;
+}
+.person-result p {
+  margin: 4px 0 0;
+  color: #8490a4;
+  font-size: 10px;
+}
+.leader-avatar img,
+.detail-mascot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+  align-items: start;
+}
+.settings-column {
+  display: grid;
+  gap: 20px;
+}
+.settings-card {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid #253149;
+  border-radius: 18px;
+  background: #0e1522;
+}
+.settings-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+.settings-card p {
+  margin: 0;
+  color: #8793a7;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.channel-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.channel-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #263249;
+  border-radius: 9px;
+  background: #0a101b;
+  font-size: 10px;
+}
+.channel-list button {
+  padding: 5px 7px;
+  color: #9badff;
+  border: 0;
+  background: transparent;
+  font-size: 9px;
+}
+.channel-list button:disabled {
+  opacity: 0.45;
+}
+.danger-card {
+  border-color: #562d38;
+}
+.public-profile-card {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 45px;
+  align-items: center;
+}
+.public-profile-card h1 {
+  margin: 15px 0;
+  font-size: 52px;
+}
+.public-profile-card p {
+  color: #8d99ad;
+  line-height: 1.7;
+}
+.profile-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 22px 0;
+}
+.profile-metrics span {
+  padding: 10px 12px;
+  border: 1px solid #293650;
+  border-radius: 10px;
+  color: #8996aa;
+  font-size: 10px;
+}
+.profile-metrics strong {
+  color: white;
+}
 .not-found h1 {
   margin: 0;
   font-size: 38px;
@@ -1920,5 +2120,18 @@ body {
   }
   .hero::before {
     top: 80px;
+  }
+  .directory-filters,
+  .settings-grid,
+  .people-results,
+  .public-profile-card {
+    grid-template-columns: 1fr;
+  }
+  .person-result {
+    grid-template-columns: auto 1fr;
+  }
+  .person-result .button {
+    grid-column: 2;
+    width: max-content;
   }
 }

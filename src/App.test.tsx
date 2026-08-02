@@ -7,6 +7,13 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { AuthContext, type AuthContextValue } from "./auth/authContext";
 import { AuthButton } from "./components/AuthButton";
 import { exchangePrivyToken } from "./services/userService";
+import {
+  searchUsers,
+  updateUser,
+  updateUserRole,
+  verifyWallet,
+} from "./services/userService";
+import { clearPlatformJwt, setPlatformJwt } from "./auth/platformTokenStore";
 
 function renderApplication(initialRoute = "/") {
   return render(
@@ -19,6 +26,11 @@ function renderApplication(initialRoute = "/") {
 }
 
 afterEach(cleanup);
+afterEach(() => {
+  clearPlatformJwt();
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
 
 describe("MemeTokenHub application", () => {
   it("renders the main discovery experience", () => {
@@ -123,5 +135,42 @@ describe("MemeTokenHub application", () => {
     );
     await user.click(retryButton);
     expect(retryExchange).toHaveBeenCalledOnce();
+  });
+
+  it("builds public user search filters from the documented contract", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response("[]", { status: 200 }));
+    await searchUsers({
+      query: "meme",
+      limit: 12,
+      accountType: "KOL",
+      verified: true,
+      network: "Solana",
+    });
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      "https://api.example.com/api/users/search?query=meme&limit=12&accountType=KOL&verified=true&network=Solana",
+    );
+  });
+
+  it("attaches the platform JWT to protected profile, wallet, and role writes", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        new Response(JSON.stringify({ userId: "user-123", verified: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    await updateUser("user-123", { displayName: "Meme Lord" });
+    await verifyWallet("user-123", "signed-proof");
+    await updateUserRole("user-123", "KOL");
+    for (const [, options] of fetchMock.mock.calls) {
+      expect(new Headers(options?.headers).get("Authorization")).toBe(
+        "Bearer platform-jwt",
+      );
+    }
   });
 });

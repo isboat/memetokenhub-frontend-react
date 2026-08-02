@@ -92,6 +92,23 @@ The exchange response must have this shape:
 }
 ```
 
+### User Service feature coverage
+
+The frontend includes typed User Service clients and user-facing flows for the remaining documented endpoints:
+
+| Capability                                            | Endpoint / route                                |
+| ----------------------------------------------------- | ----------------------------------------------- |
+| Public profile                                        | `GET /api/users/{userId}` → `/profile/:userId`  |
+| Private profile bootstrap                             | `GET /api/users/me` → `/profile`                |
+| Create and update profile                             | `POST /api/users`, `PUT /api/users/{userId}`    |
+| Account deactivation                                  | `DELETE /api/users/{userId}`                    |
+| Filtered people search                                | `GET /api/users/search` → `/people`             |
+| Wallet verification                                   | `POST /api/users/{userId}/verify-wallet`        |
+| Admin role assignment                                 | `PUT /api/users/{userId}/role` → `/admin/users` |
+| Connect, list, verify, and disconnect social channels | `/api/users/{userId}/social-channels/*`         |
+
+Private profile fields and wallet/provider proofs are never rendered in the public profile page. Role administration is capability-gated in the UI and intentionally excludes assigning `Moderator`; the backend remains authoritative for ownership and authorization on every protected request.
+
 ## Continuous integration and deployment
 
 ### Main deployment
