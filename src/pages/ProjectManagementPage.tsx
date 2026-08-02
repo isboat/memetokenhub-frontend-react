@@ -1,6 +1,7 @@
 import { ImageUp, Rocket, Save, ShieldCheck } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { useAuth } from "../auth/authContext";
+import { PlatformSessionPanel } from "../components/PlatformSessionPanel";
 import type { TokenProject, TokenWriteInput } from "../services/tokenService";
 import {
   createToken,
@@ -24,7 +25,7 @@ const emptyProject: TokenWriteInput = {
 };
 
 export function ProjectManagementPage() {
-  const { status, user, login } = useAuth();
+  const { status, user } = useAuth();
   const [projects, setProjects] = useState<TokenProject[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [draft, setDraft] = useState<TokenWriteInput>(emptyProject);
@@ -55,22 +56,11 @@ export function ProjectManagementPage() {
   }, [status, user]);
   if (status !== "authenticated")
     return (
-      <main className="auth-page page-shell">
-        <section className="auth-panel">
-          <Rocket />
-          <h1>Launch your project home.</h1>
-          <p>
-            Connect with Privy to create and publish a meme-token community.
-          </p>
-          <button
-            className="button button-primary"
-            type="button"
-            onClick={login}
-          >
-            Connect with Privy
-          </button>
-        </section>
-      </main>
+      <PlatformSessionPanel
+        icon={<Rocket />}
+        heading="Launch your project home."
+        description="Connect with Privy to create and publish a meme-token community."
+      />
     );
   if (!canWrite)
     return (

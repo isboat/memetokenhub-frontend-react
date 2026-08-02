@@ -216,6 +216,62 @@ describe("MemeTokenHub application", () => {
     expect(retryExchange).toHaveBeenCalledOnce();
   });
 
+  it("keeps Verify and Launch in exchange-failure state instead of showing Privy connect", async () => {
+    const testUser = userEvent.setup();
+    const retryExchange = vi.fn();
+    const login = vi.fn();
+    const failedExchangeContext: AuthContextValue = {
+      status: "error",
+      user: null,
+      errorMessage: "The platform token exchange failed after Privy login.",
+      login,
+      logout: vi.fn(async () => undefined),
+      retryExchange,
+    };
+
+    const launchView = render(
+      <AuthContext.Provider value={failedExchangeContext}>
+        <MemoryRouter initialEntries={["/projects/manage"]}>
+          <App />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+    expect(
+      screen.getByRole("heading", {
+        name: "Privy connected. Session exchange failed.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Connect with Privy" }),
+    ).not.toBeInTheDocument();
+    await testUser.click(
+      screen.getByRole("button", { name: "Retry secure session" }),
+    );
+    launchView.unmount();
+
+    render(
+      <AuthContext.Provider value={failedExchangeContext}>
+        <MemoryRouter initialEntries={["/claims"]}>
+          <App />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+    expect(
+      screen.getByRole("heading", {
+        name: "Privy connected. Session exchange failed.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Connect with Privy" }),
+    ).not.toBeInTheDocument();
+    await testUser.click(
+      screen.getByRole("button", { name: "Retry secure session" }),
+    );
+
+    expect(retryExchange).toHaveBeenCalledTimes(2);
+    expect(login).not.toHaveBeenCalled();
+  });
+
   it("builds public user search filters from the documented contract", async () => {
     vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
     const fetchMock = vi

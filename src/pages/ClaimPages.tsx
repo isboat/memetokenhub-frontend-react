@@ -10,6 +10,7 @@ import {
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../auth/authContext";
+import { PlatformSessionPanel } from "../components/PlatformSessionPanel";
 import {
   appealClaim,
   type Claim,
@@ -58,32 +59,12 @@ function formatDate(value?: string) {
 }
 
 function SignInPanel() {
-  const { login, status } = useAuth();
-  const isLoading = status === "loading" || status === "exchanging";
   return (
-    <main className="auth-page page-shell">
-      <section className="auth-panel">
-        <LockKeyhole />
-        <h1>
-          {isLoading
-            ? "Preparing your secure session…"
-            : "Connect to manage claims."}
-        </h1>
-        <p>
-          {isLoading
-            ? "Your MemeTokenHub access is being verified."
-            : "Your private proof and claim history are available only to you."}
-        </p>
-        <button
-          className="button button-primary"
-          type="button"
-          onClick={login}
-          disabled={isLoading}
-        >
-          {isLoading ? "Connecting…" : "Connect with Privy"}
-        </button>
-      </section>
-    </main>
+    <PlatformSessionPanel
+      icon={<LockKeyhole />}
+      heading="Connect to manage claims."
+      description="Your private proof and claim history are available only to you."
+    />
   );
 }
 
