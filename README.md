@@ -75,6 +75,23 @@ Copy `.env.example` to `.env.local`. Only variables prefixed with `VITE_` are ex
 | `VITE_PRIVY_APP_ID`       | Public Privy application identifier.                    |
 | `VITE_HELIO_PAYSTREAM_ID` | Public Helio checkout configuration identifier.         |
 
+### Privy token exchange
+
+When `VITE_PRIVY_APP_ID` is configured, the root `AuthProvider` opens Privy's email or wallet login flow. After Privy authenticates the visitor, the frontend retrieves the short-lived Privy access token and sends `{ "privyToken": "..." }` to `POST /api/users/auth/exchange` at `VITE_API_BASE_URL`. The resulting MemeTokenHub JWT is held in memory—not local storage—and is attached as a bearer token by the shared Gateway client. Signing out and backend `401` responses clear that token.
+
+The exchange response must have this shape:
+
+```json
+{
+  "jwtToken": "backend-issued-jwt",
+  "user": {
+    "userId": "platform-user-id",
+    "username": "optional-display-name",
+    "role": "AuthenticatedUser"
+  }
+}
+```
+
 ## Continuous integration and deployment
 
 ### Main deployment
@@ -84,6 +101,8 @@ Copy `.env.example` to `.env.local`. Only variables prefixed with `VITE_` are ex
 Create this GitHub Actions repository secret before deploying:
 
 - `AZURE_STATIC_WEB_APPS_API_TOKEN` — deployment token supplied by Azure Static Web Apps.
+
+Also create repository variables named `VITE_API_BASE_URL`, `VITE_PRIVY_APP_ID`, and, when checkout is enabled, `VITE_HELIO_PAYSTREAM_ID`. Vite embeds these public configuration values during the production build; adding them only to the Static Web App runtime configuration will not update an already-built SPA.
 
 ### Pull requests
 

@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../auth/authContext";
 import { communityLeaders, memeTokens } from "../data/mockData";
 import { TokenCard } from "../components/TokenCard";
 
@@ -179,6 +180,68 @@ export function TokenDetailsPage() {
 }
 
 export function DashboardPage() {
+  const { status, user, errorMessage, login, logout, retryExchange } =
+    useAuth();
+
+  if (status !== "authenticated") {
+    return (
+      <main className="auth-page page-shell">
+        <section className="auth-panel">
+          <span className="auth-panel-icon">
+            <ShieldCheck />
+          </span>
+          <div className="eyebrow purple">Protected experience</div>
+          <h1>
+            {status === "not-configured"
+              ? "Connect your Privy app."
+              : "Join the hub."}
+          </h1>
+          <p>
+            {status === "not-configured"
+              ? "Set VITE_PRIVY_APP_ID and VITE_API_BASE_URL to enable the documented Privy token exchange."
+              : status === "error"
+                ? errorMessage
+                : status === "exchanging" || status === "loading"
+                  ? "Verifying your Privy session and creating a secure MemeTokenHub session…"
+                  : "Sign in with email or a wallet. MemeTokenHub exchanges your Privy token for a secure platform session."}
+          </p>
+          {status === "anonymous" && (
+            <button
+              className="button button-primary"
+              type="button"
+              onClick={login}
+            >
+              Connect with Privy
+            </button>
+          )}
+          {status === "error" && (
+            <div className="hero-actions">
+              <button
+                className="button button-primary"
+                type="button"
+                onClick={retryExchange}
+              >
+                Try exchange again
+              </button>
+              <button
+                className="button button-secondary"
+                type="button"
+                onClick={() => void logout()}
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+          {status === "not-configured" && (
+            <Link className="button button-secondary" to="/learn">
+              View trust center
+            </Link>
+          )}
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="subpage page-shell dashboard">
       <div className="page-intro">
@@ -191,8 +254,8 @@ export function DashboardPage() {
           <span>meme culture.</span>
         </h1>
         <p>
-          This preview shows the authenticated experience. Connect Privy and the
-          API Gateway to populate live personal data.
+          Welcome back{user?.username ? `, ${user.username}` : ""}. Your Privy
+          identity is connected to a MemeTokenHub platform session.
         </p>
       </div>
       <div className="dashboard-grid">

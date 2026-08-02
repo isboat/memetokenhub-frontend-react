@@ -154,6 +154,19 @@ button {
 .button:hover {
   transform: translateY(-2px);
 }
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .button.compact {
   min-height: 42px;
   padding-inline: 18px;
@@ -1148,6 +1161,45 @@ button {
   color: #7042ff;
   font-size: 90px;
   font-weight: 950;
+}
+.auth-page {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding-block: 80px;
+}
+.auth-panel {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(32px, 6vw, 60px);
+  border: 1px solid #293752;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #111a2a, #0b111d);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.32);
+  text-align: center;
+}
+.auth-panel-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+  color: #93a6ff;
+  border-radius: 18px;
+  background: #1d2b51;
+}
+.auth-panel h1 {
+  margin: 20px 0 12px;
+  font-size: clamp(34px, 6vw, 52px);
+  letter-spacing: -0.05em;
+}
+.auth-panel p {
+  max-width: 440px;
+  margin: 0 0 26px;
+  color: #8d99ad;
+  line-height: 1.7;
 }
 .not-found h1 {
   margin: 0;

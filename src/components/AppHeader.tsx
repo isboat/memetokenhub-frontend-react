@@ -1,6 +1,7 @@
 import { Menu, Search, Sparkles, Star, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { AuthButton } from "./AuthButton";
 
 const navigationItems = [
   { label: "Discover", to: "/" },
@@ -69,9 +70,7 @@ export function AppHeader() {
           >
             <Search size={20} />
           </Link>
-          <Link className="button button-primary compact" to="/dashboard">
-            Join the hub
-          </Link>
+          <AuthButton />
           <button
             className="icon-button menu-button"
             type="button"

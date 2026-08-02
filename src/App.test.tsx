@@ -1,14 +1,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { AuthProvider } from "./auth/AuthProvider";
+import { exchangePrivyToken } from "./services/userService";
 
 function renderApplication(initialRoute = "/") {
   return render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <App />
-    </MemoryRouter>,
+    <AuthProvider>
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <App />
+      </MemoryRouter>
+    </AuthProvider>,
   );
 }
 
@@ -56,7 +60,36 @@ describe("MemeTokenHub application", () => {
     );
 
     expect(
-      screen.getByRole("heading", { name: /your corner of.*meme culture/i }),
+      screen.getByRole("heading", { name: /connect your Privy app/i }),
     ).toBeInTheDocument();
+  });
+
+  it("sends the documented Privy token exchange request", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          jwtToken: "platform-jwt",
+          user: { userId: "user-123", username: "MemeLord" },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+
+    await expect(
+      exchangePrivyToken("privy-access-token"),
+    ).resolves.toMatchObject({
+      jwtToken: "platform-jwt",
+      user: { userId: "user-123" },
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/api/users/auth/exchange",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ privyToken: "privy-access-token" }),
+      }),
+    );
+    fetchMock.mockRestore();
+    vi.unstubAllEnvs();
   });
 });
