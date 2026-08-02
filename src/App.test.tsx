@@ -4,6 +4,8 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthProvider";
+import { AuthContext, type AuthContextValue } from "./auth/authContext";
+import { AuthButton } from "./components/AuthButton";
 import { exchangePrivyToken } from "./services/userService";
 
 function renderApplication(initialRoute = "/") {
@@ -91,5 +93,35 @@ describe("MemeTokenHub application", () => {
     );
     fetchMock.mockRestore();
     vi.unstubAllEnvs();
+  });
+
+  it("shows a retry action when Privy succeeded but token exchange failed", async () => {
+    const user = userEvent.setup();
+    const retryExchange = vi.fn();
+    const failedExchangeContext: AuthContextValue = {
+      status: "error",
+      user: null,
+      errorMessage: "We could not finish signing you in. Please try again.",
+      login: vi.fn(),
+      logout: vi.fn(async () => undefined),
+      retryExchange,
+    };
+
+    render(
+      <AuthContext.Provider value={failedExchangeContext}>
+        <AuthButton />
+      </AuthContext.Provider>,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Connect" }),
+    ).not.toBeInTheDocument();
+    const retryButton = screen.getByRole("button", { name: "Retry session" });
+    expect(retryButton).toHaveAttribute(
+      "title",
+      failedExchangeContext.errorMessage,
+    );
+    await user.click(retryButton);
+    expect(retryExchange).toHaveBeenCalledOnce();
   });
 });

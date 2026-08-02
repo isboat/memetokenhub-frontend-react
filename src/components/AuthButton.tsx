@@ -1,8 +1,9 @@
-import { LogIn, LogOut, LoaderCircle } from "lucide-react";
+import { LogIn, LogOut, LoaderCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "../auth/authContext";
 
 export function AuthButton() {
-  const { status, user, login, logout } = useAuth();
+  const { status, user, errorMessage, login, logout, retryExchange } =
+    useAuth();
   const isBusy = status === "loading" || status === "exchanging";
 
   if (status === "authenticated") {
@@ -13,6 +14,19 @@ export function AuthButton() {
         onClick={() => void logout()}
       >
         <LogOut size={15} /> <span>{user?.username ?? "Sign out"}</span>
+      </button>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <button
+        className="button button-error compact auth-button"
+        type="button"
+        title={errorMessage ?? "The MemeTokenHub session could not be created."}
+        onClick={retryExchange}
+      >
+        <RefreshCw size={15} /> <span>Retry session</span>
       </button>
     );
   }

@@ -186,6 +186,17 @@ button {
   background: #fff;
   border: 1px solid #dedbe3;
 }
+.button-error {
+  color: #ffd9dd;
+  border: 1px solid #713440;
+  background: #3b1c27;
+  box-shadow: 0 8px 22px rgba(118, 33, 49, 0.2);
+}
+.button-error:hover {
+  color: white;
+  border-color: #a94b5d;
+  background: #522431;
+}
 .button-dark {
   color: white;
   background: #17141e;
