@@ -46,6 +46,24 @@ import {
   submitClaim,
   uploadClaimAttachment,
 } from "./services/claimService";
+import {
+  cancelSubscription,
+  getMyCreatorEarnings,
+  getMyEntitlements,
+  getPaymentHistory,
+  startCreatorCheckout,
+  startTokenCheckout,
+} from "./services/paymentService";
+import {
+  getMyNotificationPreferences,
+  getMyNotifications,
+  getUserNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+  updateMyNotificationPreferences,
+  updateUserNotificationPreferences,
+  type NotificationPreferences,
+} from "./services/notificationService";
 
 function renderApplication(initialRoute = "/") {
   return render(
@@ -526,5 +544,109 @@ describe("MemeTokenHub application", () => {
     expect(
       screen.queryByText("private moderator note"),
     ).not.toBeInTheDocument();
+  });
+
+  it("builds all browser-facing Payment Service requests without exposing confirmation", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (_url, options) =>
+        options?.method === "DELETE"
+          ? new Response(null, { status: 204 })
+          : new Response(JSON.stringify([]), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+      );
+    await startTokenCheckout({
+      userId: "user-1",
+      tokenId: "token-1",
+      amount: 5,
+    });
+    await getPaymentHistory("user / 1");
+    await startCreatorCheckout({
+      creatorId: "creator-1",
+      purpose: "PremiumPost",
+      postId: "post-1",
+      amount: 10,
+      currency: "USD",
+    });
+    await getMyEntitlements({ creatorId: "creator-1", postId: "post-1" });
+    await cancelSubscription("subscription / 1");
+    await getMyCreatorEarnings({
+      from: "2026-01-01",
+      to: "2026-02-01",
+      limit: 10,
+      offset: 5,
+    });
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/payments/checkout",
+      "https://api.example.com/api/payments/user%20%2F%201/history",
+      "https://api.example.com/api/payments/creator-checkout",
+      "https://api.example.com/api/payments/me/entitlements?creatorId=creator-1&postId=post-1",
+      "https://api.example.com/api/payments/subscriptions/subscription%20%2F%201",
+      "https://api.example.com/api/payments/creators/me/earnings?limit=10&offset=5&from=2026-01-01&to=2026-02-01",
+    ]);
+    expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
+      "POST",
+      undefined,
+      "POST",
+      undefined,
+      "DELETE",
+      undefined,
+    ]);
+    expect(
+      fetchMock.mock.calls.some(([url]) => String(url).includes("/confirm")),
+    ).toBe(false);
+  });
+
+  it("builds subject-derived and compatibility Notification Service requests", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const preferences: NotificationPreferences = {
+      channels: { InApp: true, Email: false, Push: false },
+      events: { NewPost: { InApp: true } },
+      digestFrequency: "Daily",
+    };
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (url, options) => {
+        if (String(url).endsWith("/read-all"))
+          return new Response(null, { status: 204 });
+        return new Response(
+          JSON.stringify(options?.method === "PUT" ? preferences : []),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      });
+    await getMyNotifications(true, 10, 5);
+    fetchMock.mockImplementationOnce(
+      async () =>
+        new Response(JSON.stringify(preferences), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    await getMyNotificationPreferences();
+    await updateMyNotificationPreferences(preferences);
+    await markNotificationRead("notice / 1");
+    await markAllNotificationsRead();
+    await getUserNotifications("user / 1");
+    await updateUserNotificationPreferences("user / 1", preferences);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/notifications/me?unreadOnly=true&limit=10&offset=5",
+      "https://api.example.com/api/notifications/me/preferences",
+      "https://api.example.com/api/notifications/me/preferences",
+      "https://api.example.com/api/notifications/notice%20%2F%201/read",
+      "https://api.example.com/api/notifications/read-all",
+      "https://api.example.com/api/notifications/user%20%2F%201",
+      "https://api.example.com/api/notifications/user%20%2F%201/preferences",
+    ]);
+    expect(
+      fetchMock.mock.calls.some(([url]) => String(url).endsWith("/send")),
+    ).toBe(false);
   });
 });

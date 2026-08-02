@@ -25,6 +25,8 @@ import {
   ModeratorClaimsPage,
   PublicClaimStatusPage,
 } from "./pages/ClaimPages";
+import { CreatorEarningsPage, PaymentsPage } from "./pages/PaymentPages";
+import { NotificationPage } from "./pages/NotificationPage";
 
 export default function App() {
   return (
@@ -49,6 +51,9 @@ export default function App() {
           element={<PublicClaimStatusPage />}
         />
         <Route path="/moderation/claims" element={<ModeratorClaimsPage />} />
+        <Route path="/payments" element={<PaymentsPage />} />
+        <Route path="/creator/earnings" element={<CreatorEarningsPage />} />
+        <Route path="/notifications" element={<NotificationPage />} />
         <Route path="/token/:tokenId" element={<TokenDetailsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

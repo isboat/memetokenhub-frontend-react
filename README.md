@@ -55,13 +55,18 @@ Vite prints the local development URL, normally `http://localhost:5173`.
 
 ## Routes
 
-| Route             | Description                                                                    |
-| ----------------- | ------------------------------------------------------------------------------ |
-| `/`               | Public token discovery, search, filters, community voices, and trust overview. |
-| `/token/:tokenId` | Project identity, price context, and organic sentiment.                        |
-| `/community`      | Verified community voices.                                                     |
-| `/learn`          | Verification and organic-discovery trust center.                               |
-| `/dashboard`      | Preview of the protected personalized experience.                              |
+| Route                | Description                                                                    |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `/`                  | Public token discovery, search, filters, community voices, and trust overview. |
+| `/token/:tokenId`    | Project identity, price context, and organic sentiment.                        |
+| `/community`         | Verified community voices.                                                     |
+| `/learn`             | Verification and organic-discovery trust center.                               |
+| `/dashboard`         | Protected personalized experience.                                             |
+| `/claims`            | Private claim submission, history, evidence uploads, and appeals.              |
+| `/moderation/claims` | Capability-gated claim review and audit history.                               |
+| `/notifications`     | Subject-derived inbox, read state, channel controls, and digest preferences.   |
+| `/payments`          | Checkout disclosures, entitlements, renewal cancellation, and receipts.        |
+| `/creator/earnings`  | Private creator revenue, fee, and transaction summaries.                       |
 
 Unknown routes display a branded not-found page.
 
@@ -126,6 +131,18 @@ Token detail pages use Social Service—not Token Service—for community writes
 The Claim Service client covers private claim submission and owner history, moderator pending and reviewed queues, approve/reject decisions with required notes, one-time rejected-claim appeals, public redacted status, and restricted signed evidence uploads. The browser accepts only PNG, JPEG, WebP, and PDF evidence up to 10 MB, uploads it directly to signed storage, and stores only the returned object reference.
 
 Authenticated users can use `/claims` for `ProjectOwnership`, `SocialIdentity`, and `OfficialRepresentative` verification workflows. Moderators with the `claims:review` capability use `/moderation/claims`; `/claims/:claimId/status` is the optional-auth public badge surface and intentionally cannot render proof fields, attachments, reviewer identity, or reviewer notes. Backend state transitions, claimant/project validation, evidence scanning, appeal uniqueness, concurrency, and approval events remain authoritative in Claim Service.
+
+### Payment Service feature coverage
+
+The Payment Service client covers token and creator checkout sessions, owner payment history and receipts, creator subscriptions/tips/premium posts, entitlement filtering, subscription-renewal cancellation, and paginated creator earnings. `/payments` discloses the server-confirmed total, currency, fees, creator share, and renewal terms before linking to Helio; `/creator/earnings` is restricted to creator/KOL roles or `payments:earnings` capability.
+
+Checkout return URLs never grant access in the browser. Subscriptions and premium-post access appear only through webhook-confirmed `/me/entitlements` results. The Helio `/confirm` webhook is deliberately absent from frontend code, amounts are treated as offer requests rather than trusted prices, and monetization is not connected to rankings, sentiment, reputation, or verification.
+
+### Notification Service feature coverage
+
+`/notifications` uses the subject-derived inbox and preference routes with unread filtering, individual/read-all actions, global channel controls, per-event/per-channel settings, and immediate/daily/weekly/off digest frequency. Compatibility user-ID methods remain available for older callers while backend ownership checks remain authoritative.
+
+The internal `/api/notifications/send` endpoint is deliberately absent from the browser client. Notifications are displayed only after the service consumes source events, applies preferences, and creates inbox records; the frontend does not trigger delivery or synchronously couple producer requests to Notification Service availability.
 
 ## Continuous integration and deployment
 

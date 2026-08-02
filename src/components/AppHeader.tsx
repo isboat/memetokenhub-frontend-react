@@ -1,4 +1,4 @@
-import { Menu, Search, Sparkles, Star, X } from "lucide-react";
+import { Bell, Menu, Search, Sparkles, Star, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthButton } from "./AuthButton";
@@ -64,6 +64,13 @@ export function AppHeader() {
         </nav>
 
         <div className="header-actions">
+          <Link
+            className="icon-button"
+            to="/notifications"
+            aria-label="Notifications"
+          >
+            <Bell size={19} />
+          </Link>
           <Link className="watchlist-link" to="/dashboard">
             <Star size={17} /> <span>Watchlist</span>
           </Link>

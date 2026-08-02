@@ -985,7 +985,7 @@ button {
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  grid-template-columns: 2fr repeat(4, 1fr);
   gap: 45px;
 }
 .footer-brand {
@@ -2169,6 +2169,345 @@ button {
   }
   .public-claim-card dl {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Payment and Notification Service experiences. */
+.money-page,
+.notifications-page {
+  padding-block: 64px 100px;
+}
+.money-hero,
+.notification-hero {
+  margin-bottom: 30px;
+}
+.money-hero {
+  max-width: 780px;
+}
+.money-hero h1,
+.notification-hero h1 {
+  margin: 14px 0 12px;
+  color: #f4f7ff;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1.02;
+}
+.money-hero p,
+.notification-hero p,
+.money-heading p {
+  color: #8996aa;
+}
+.money-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.money-panel,
+.preference-panel,
+.inbox-panel,
+.checkout-disclosure {
+  border: 1px solid #273650;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #111a2a, #0b121f);
+  padding: 25px;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.22);
+}
+.money-section,
+.preference-panel {
+  margin-top: 24px;
+}
+.money-heading {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.money-heading > svg {
+  color: #52d9ad;
+}
+.money-heading h2,
+.preference-panel h2 {
+  margin: 0;
+  color: #edf2fb;
+}
+.money-heading p {
+  margin: 5px 0 0;
+}
+.money-form,
+.earnings-filters {
+  display: grid;
+  gap: 16px;
+}
+.money-form label,
+.earnings-filters label,
+.digest-select {
+  display: grid;
+  gap: 7px;
+  color: #c8d2e3;
+  font-weight: 650;
+}
+.money-form input,
+.money-form select,
+.earnings-filters input,
+.digest-select select {
+  width: 100%;
+  border: 1px solid #31415d;
+  border-radius: 10px;
+  color: #edf2fa;
+  background: #09101b;
+  padding: 12px;
+  font: inherit;
+}
+.money-fields,
+.earnings-filters {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.earnings-filters {
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  max-width: 720px;
+}
+.checkout-disclosure {
+  max-width: 720px;
+  margin: 24px auto;
+  border-color: #3b5684;
+}
+.checkout-disclosure > div {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #283650;
+  padding: 10px 0;
+  color: #9ba8bb;
+}
+.checkout-disclosure strong {
+  color: #eff4fc;
+}
+.checkout-disclosure p,
+.checkout-disclosure small {
+  color: #8795a9;
+}
+.checkout-disclosure .button {
+  margin-block: 18px 10px;
+}
+.entitlement-grid,
+.earnings-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.entitlement-grid article,
+.earnings-summary article {
+  border: 1px solid #293852;
+  border-radius: 14px;
+  background: #0a111d;
+  padding: 17px;
+}
+.entitlement-grid h3,
+.earnings-summary strong {
+  color: #eef3fc;
+}
+.entitlement-grid p,
+.entitlement-grid dt,
+.earnings-summary span {
+  color: #8795aa;
+}
+.entitlement-grid dl {
+  display: flex;
+  gap: 22px;
+}
+.entitlement-grid dd {
+  margin: 3px 0 0;
+  color: #dce3ef;
+}
+.payment-state {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: #f4c76b;
+  background: rgba(213, 160, 49, 0.14);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+.payment-state.completed,
+.payment-state.active {
+  color: #4bdfad;
+  background: rgba(53, 200, 151, 0.14);
+}
+.payment-state.failed,
+.payment-state.expired,
+.payment-state.cancelled {
+  color: #ff7e8d;
+  background: rgba(218, 69, 88, 0.14);
+}
+.payment-table {
+  display: grid;
+  gap: 9px;
+}
+.payment-table article {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 14px;
+  align-items: center;
+  border-bottom: 1px solid #26344c;
+  padding: 12px 0;
+  color: #8492a7;
+}
+.payment-table article > div {
+  display: grid;
+}
+.payment-table strong {
+  color: #e8edf6;
+}
+.payment-table a {
+  display: inline-flex;
+  gap: 5px;
+  color: #91a5ff;
+}
+.earnings-summary {
+  margin-top: 25px;
+}
+.earnings-summary article {
+  display: grid;
+  gap: 8px;
+}
+.earnings-summary strong {
+  font-size: 1.6rem;
+}
+.notification-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: end;
+}
+.notification-hero > div {
+  max-width: 760px;
+}
+.channel-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.channel-toggles label,
+.inbox-toolbar label {
+  color: #c4cede;
+}
+.digest-select {
+  max-width: 260px;
+  margin-bottom: 20px;
+}
+.preference-matrix {
+  margin-block: 20px;
+  overflow-x: auto;
+}
+.preference-matrix > div {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) repeat(3, 100px);
+  min-width: 520px;
+  border-bottom: 1px solid #25344d;
+  padding: 10px;
+  color: #b7c2d3;
+}
+.preference-matrix label,
+.preference-matrix strong:not(:first-child) {
+  text-align: center;
+}
+.inbox-panel {
+  margin-top: 24px;
+}
+.inbox-toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.inbox-toolbar .text-button {
+  display: flex;
+  gap: 6px;
+}
+.notification-list {
+  display: grid;
+  gap: 8px;
+}
+.notification-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: start;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  padding: 16px;
+  background: #0a111c;
+  cursor: pointer;
+}
+.notification-item.unread {
+  border-color: #354c82;
+  background: #101a2e;
+}
+.notification-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  color: #98aaff;
+  background: #1c2947;
+}
+.notification-item > div > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.notification-item strong {
+  color: #eaf0fa;
+}
+.notification-item time,
+.notification-item p {
+  color: #8390a4;
+}
+.notification-item p {
+  margin: 6px 0;
+}
+.notification-item a {
+  color: #91a5ff;
+}
+.notification-item > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6f8cff;
+}
+.notification-empty {
+  padding: 55px 20px;
+  text-align: center;
+  color: #8492a7;
+}
+.notification-empty h2 {
+  color: #e8edf7;
+}
+
+@media (max-width: 800px) {
+  .money-layout,
+  .entitlement-grid,
+  .earnings-summary {
+    grid-template-columns: 1fr;
+  }
+  .notification-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .money-fields,
+  .earnings-filters {
+    grid-template-columns: 1fr;
+  }
+  .payment-table article {
+    grid-template-columns: auto 1fr;
+  }
+  .notification-item > div > div {
+    display: grid;
   }
 }
 @media (prefers-reduced-motion: reduce) {

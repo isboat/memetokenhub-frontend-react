@@ -30,6 +30,12 @@ export function Footer() {
           <a href="mailto:hello@memetokenhub.com">Contact</a>
         </div>
         <div>
+          <h3>Your hub</h3>
+          <Link to="/notifications">Notifications</Link>
+          <Link to="/payments">Payments &amp; access</Link>
+          <Link to="/claims">Verification</Link>
+        </div>
+        <div>
           <h3>Join the conversation</h3>
           <div className="social-links">
             <a href="https://x.com" aria-label="X community">
