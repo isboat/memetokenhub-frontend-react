@@ -27,7 +27,7 @@ The current UI uses clearly labelled local sample data while backend services ar
 
 ### Prerequisites
 
-- Node.js 22 or newer
+- Node.js 22.12 or newer
 - npm 10 or newer
 
 ### Installation
@@ -117,6 +117,14 @@ Also create repository variables named `VITE_API_BASE_URL`, `VITE_PRIVY_APP_ID`,
 - Sponsorship must stay visibly separate from votes, support, reputation, and organic trends.
 
 The full product and integration specifications are available in the `docs/mth-docs` submodule.
+
+## Dependency notices
+
+The application directly depends on maintained packages, including the current `@privy-io/react-auth` release. Some versions of npm print deprecation notices for packages nested under Privy's wallet-connection stack—primarily `x402`, Wagmi connectors, MetaMask SDK, Safe SDK, WalletConnect, and their older `uuid`/QR dependencies. They are not direct MemeTokenHub dependencies and cannot be replaced from this repository without overriding Privy's tested dependency graph.
+
+Use `npm explain <package-name>` to verify ownership of a notice. Do not add `uuid`, `qr`, MetaMask, Safe, or WalletConnect packages directly merely to suppress npm output; doing so does not replace the nested copy and can create an unsupported authentication bundle. These notices should be resolved by upgrading `@privy-io/react-auth` when Privy publishes a dependency refresh.
+
+The Solana packages listed directly in `package.json` are optional Privy peer dependencies required by the current Vite bundler to resolve Privy's exported wallet modules. The unused Abstract, Farcaster, and `permissionless` optional peers are intentionally omitted to keep the installation smaller.
 
 ## Azure Static Web Apps
 
