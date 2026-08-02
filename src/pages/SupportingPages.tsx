@@ -45,7 +45,13 @@ export function CommunityPage() {
               <strong>{leader.followers}</strong>
               <span>followers</span>
             </div>
-            <button type="button">Follow</button>
+            <Link
+              className="leader-follow-button"
+              to="/dashboard"
+              aria-label={`Sign in to follow ${leader.name}`}
+            >
+              Follow
+            </Link>
           </article>
         ))}
       </div>

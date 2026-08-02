@@ -46,4 +46,17 @@ describe("MemeTokenHub application", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("95% hot")).toBeInTheDocument();
   });
+
+  it("routes follow actions through the sign-in dashboard", async () => {
+    const user = userEvent.setup();
+    renderApplication();
+
+    await user.click(
+      screen.getByRole("link", { name: "Sign in to follow MemeLord" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /your corner of.*meme culture/i }),
+    ).toBeInTheDocument();
+  });
 });

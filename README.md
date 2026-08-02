@@ -11,7 +11,7 @@ A modern, responsive React single-page application for discovering meme-token pr
 - Dark, crypto-native design system with layered market surfaces, vibrant gradients, expressive token artwork, and organic-signal storytelling.
 - Azure Static Web Apps deployment and pull-request verification workflows.
 
-The current UI uses realistic local sample data while backend services are being provisioned. It is structured so the documented API Gateway, Privy token exchange, and Helio checkout can be connected without making the browser authoritative for verification or payment status.
+The current UI uses clearly labelled local sample data while backend services are being provisioned. Market figures are illustrative and must not be presented as live data. The application is structured so the documented API Gateway, Privy token exchange, and Helio checkout can be connected without making the browser authoritative for verification or payment status.
 
 ## Technology
 

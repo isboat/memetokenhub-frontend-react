@@ -857,8 +857,10 @@ button {
   color: #a09aa4;
   font-size: 8px;
 }
-.leader-card button {
+.leader-card button,
+.leader-follow-button {
   grid-column: 3;
+  width: max-content;
   padding: 7px 12px;
   border: 1px solid #ded9e3;
   border-radius: 8px;
@@ -867,7 +869,8 @@ button {
   font-size: 9px;
   font-weight: 850;
 }
-.leader-card button:hover {
+.leader-card button:hover,
+.leader-follow-button:hover {
   color: white;
   background: #6f3eff;
   border-color: #6f3eff;
@@ -1385,7 +1388,8 @@ button {
   .leader-followers {
     display: none;
   }
-  .leader-card button {
+  .leader-card button,
+  .leader-follow-button {
     grid-column: 2;
     width: max-content;
   }
@@ -1450,6 +1454,17 @@ body {
 .market-bar strong {
   margin-left: 4px;
   color: #c7d0df;
+}
+.preview-label {
+  padding: 3px 6px;
+  color: #aeb9cc;
+  border: 1px solid #2a374d;
+  border-radius: 4px;
+  background: #121a28;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .market-bar em {
   margin-left: 3px;
@@ -1775,12 +1790,14 @@ body {
   color: #a9b6ff;
   background: #202d52;
 }
-.leader-card button {
+.leader-card button,
+.leader-follow-button {
   color: #9bafff;
   border-color: #334260;
   background: #121b2b;
 }
-.leader-card button:hover {
+.leader-card button:hover,
+.leader-follow-button:hover {
   background: #5271ff;
   border-color: #5271ff;
 }

@@ -13,8 +13,9 @@ export function AppHeader() {
 
   return (
     <header className="site-header">
-      <div className="market-bar">
+      <div className="market-bar" aria-label="Sample market overview">
         <div className="market-bar-inner">
+          <span className="preview-label">Demo data</span>
           <span>
             Coins <strong>2.4M+</strong>
           </span>
@@ -28,7 +29,7 @@ export function AppHeader() {
             BTC dominance <strong>58.4%</strong>
           </span>
           <span className="market-status">
-            <i /> Markets online
+            <i aria-hidden="true" /> Preview mode
           </span>
         </div>
       </div>
@@ -61,13 +62,13 @@ export function AppHeader() {
           <Link className="watchlist-link" to="/dashboard">
             <Star size={17} /> <span>Watchlist</span>
           </Link>
-          <button
+          <Link
             className="icon-button search-button"
-            type="button"
+            to="/#trending"
             aria-label="Search"
           >
             <Search size={20} />
-          </button>
+          </Link>
           <Link className="button button-primary compact" to="/dashboard">
             Join the hub
           </Link>

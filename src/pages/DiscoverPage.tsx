@@ -244,9 +244,13 @@ export function DiscoverPage() {
                   <strong>{leader.followers}</strong>
                   <span>followers</span>
                 </div>
-                <button type="button" aria-label={`Follow ${leader.name}`}>
+                <Link
+                  className="leader-follow-button"
+                  to="/dashboard"
+                  aria-label={`Sign in to follow ${leader.name}`}
+                >
                   Follow
-                </button>
+                </Link>
               </article>
             ))}
           </div>
