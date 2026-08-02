@@ -136,11 +136,30 @@ export async function reviewClaim(
 }
 
 export async function getPublicClaimStatus(claimId: string) {
-  return parseResponse<PublicClaimStatus>(
+  const response = await parseResponse<Record<string, unknown>>(
     await gatewayRequest(
       `/api/claims/${encodeURIComponent(claimId)}/public-status`,
     ),
   );
+  // Build an allow-listed object at the service boundary. Even if a backend
+  // regression includes evidence or review notes, browser consumers never
+  // receive those private fields from this client method.
+  return {
+    claimId: String(response.claimId ?? claimId),
+    userId: String(response.userId ?? ""),
+    tokenId: String(response.tokenId ?? ""),
+    type: response.type as ClaimType,
+    status: response.status as ClaimStatus,
+    ...(typeof response.submittedAt === "string"
+      ? { submittedAt: response.submittedAt }
+      : {}),
+    ...(typeof response.reviewedAt === "string"
+      ? { reviewedAt: response.reviewedAt }
+      : {}),
+    ...(typeof response.verifiedAt === "string"
+      ? { verifiedAt: response.verifiedAt }
+      : {}),
+  } satisfies PublicClaimStatus;
 }
 
 export async function getReviewedClaims(filters: ReviewedClaimFilters = {}) {

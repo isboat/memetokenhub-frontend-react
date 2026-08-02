@@ -1955,6 +1955,8 @@ button {
 .claim-form select,
 .claim-form textarea,
 .appeal-form textarea,
+.appeal-form input,
+.appeal-form select,
 .moderation-card textarea,
 .audit-filters input,
 .audit-filters select {

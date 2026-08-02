@@ -491,21 +491,30 @@ describe("MemeTokenHub application", () => {
 
   it("renders only the redacted public claim status fields", async () => {
     vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          claimId: "claim-1",
-          userId: "user-1",
-          tokenId: "token-1",
-          type: "ProjectOwnership",
-          status: "Approved",
-          reviewedAt: "2026-08-01T12:00:00Z",
-          proofFields: { walletTx: "private-transaction" },
-          reviewNotes: "private moderator note",
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        new Response(
+          JSON.stringify({
+            claimId: "claim-1",
+            userId: "user-1",
+            tokenId: "token-1",
+            type: "ProjectOwnership",
+            status: "Approved",
+            reviewedAt: "2026-08-01T12:00:00Z",
+            proofFields: { walletTx: "private-transaction" },
+            reviewNotes: "private moderator note",
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
     );
+    await expect(getPublicClaimStatus("claim-1")).resolves.toEqual({
+      claimId: "claim-1",
+      userId: "user-1",
+      tokenId: "token-1",
+      type: "ProjectOwnership",
+      status: "Approved",
+      reviewedAt: "2026-08-01T12:00:00Z",
+    });
     renderApplication("/claims/claim-1/status");
     expect(
       await screen.findByRole("heading", {

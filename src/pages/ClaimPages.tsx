@@ -58,15 +58,29 @@ function formatDate(value?: string) {
 }
 
 function SignInPanel() {
-  const { login } = useAuth();
+  const { login, status } = useAuth();
+  const isLoading = status === "loading" || status === "exchanging";
   return (
     <main className="auth-page page-shell">
       <section className="auth-panel">
         <LockKeyhole />
-        <h1>Connect to manage claims.</h1>
-        <p>Your private proof and claim history are available only to you.</p>
-        <button className="button button-primary" type="button" onClick={login}>
-          Connect with Privy
+        <h1>
+          {isLoading
+            ? "Preparing your secure session…"
+            : "Connect to manage claims."}
+        </h1>
+        <p>
+          {isLoading
+            ? "Your MemeTokenHub access is being verified."
+            : "Your private proof and claim history are available only to you."}
+        </p>
+        <button
+          className="button button-primary"
+          type="button"
+          onClick={login}
+          disabled={isLoading}
+        >
+          {isLoading ? "Connecting…" : "Connect with Privy"}
         </button>
       </section>
     </main>
@@ -84,6 +98,11 @@ export function ClaimCenterPage() {
   const [attachments, setAttachments] = useState<string[]>([]);
   const [appealId, setAppealId] = useState("");
   const [appealReason, setAppealReason] = useState("");
+  const [appealProofMethod, setAppealProofMethod] = useState(
+    "ContractWalletSignature",
+  );
+  const [appealProofReference, setAppealProofReference] = useState("");
+  const [appealAttachments, setAppealAttachments] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -110,6 +129,21 @@ export function ClaimCenterPage() {
       const url = await uploadClaimAttachment(file);
       setAttachments((current) => [...current, url]);
       setMessage("Evidence uploaded. It will be scanned before moderation.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function uploadAppealEvidence(file?: File) {
+    if (!file) return;
+    setBusy(true);
+    setMessage("Uploading additional appeal evidence…");
+    try {
+      const url = await uploadClaimAttachment(file);
+      setAppealAttachments((current) => [...current, url]);
+      setMessage("Appeal evidence uploaded and queued for scanning.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Upload failed.");
     } finally {
@@ -158,8 +192,17 @@ export function ClaimCenterPage() {
     try {
       const updated = await appealClaim(appealId, {
         reason: appealReason,
-        proofFields: {},
-        attachments: [],
+        proofFields: {
+          proofMethod: appealProofMethod,
+          ...(appealProofReference
+            ? appealProofMethod === "ConnectedSocial"
+              ? { socialLinks: [appealProofReference] }
+              : appealProofMethod === "DnsSiteProof"
+                ? { siteProof: appealProofReference }
+                : { walletTx: appealProofReference }
+            : {}),
+        },
+        attachments: appealAttachments,
       });
       setClaims((current) =>
         current.map((claim) =>
@@ -168,6 +211,8 @@ export function ClaimCenterPage() {
       );
       setAppealId("");
       setAppealReason("");
+      setAppealProofReference("");
+      setAppealAttachments([]);
       setMessage(
         "Appeal submitted. Only one appeal is allowed per rejected claim.",
       );
@@ -311,7 +356,12 @@ export function ClaimCenterPage() {
                 <button
                   className="text-button"
                   type="button"
-                  onClick={() => setAppealId(claim.claimId)}
+                  onClick={() => {
+                    setAppealId(claim.claimId);
+                    setAppealReason("");
+                    setAppealProofReference("");
+                    setAppealAttachments([]);
+                  }}
                 >
                   Appeal decision
                 </button>
@@ -334,6 +384,51 @@ export function ClaimCenterPage() {
                       onChange={(event) => setAppealReason(event.target.value)}
                     />
                   </label>
+                  <label>
+                    Additional proof method
+                    <select
+                      value={appealProofMethod}
+                      onChange={(event) =>
+                        setAppealProofMethod(event.target.value)
+                      }
+                    >
+                      <option value="ContractWalletSignature">
+                        Contract-wallet signature
+                      </option>
+                      <option value="DnsSiteProof">DNS or site proof</option>
+                      <option value="ConnectedSocial">
+                        Connected social channel
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    Additional proof reference (optional)
+                    <input
+                      value={appealProofReference}
+                      onChange={(event) =>
+                        setAppealProofReference(event.target.value)
+                      }
+                      placeholder="New transaction, DNS record, or HTTPS URL"
+                    />
+                  </label>
+                  <label className="claim-upload">
+                    <Upload size={18} />
+                    <span>Add appeal evidence (optional)</span>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,application/pdf"
+                      disabled={busy}
+                      onChange={(event) =>
+                        void uploadAppealEvidence(event.target.files?.[0])
+                      }
+                    />
+                  </label>
+                  {appealAttachments.length > 0 && (
+                    <p className="evidence-count">
+                      <FileCheck2 size={16} /> {appealAttachments.length} appeal
+                      file{appealAttachments.length === 1 ? "" : "s"} ready
+                    </p>
+                  )}
                   <div>
                     <button
                       className="button button-primary compact"
@@ -344,7 +439,12 @@ export function ClaimCenterPage() {
                     <button
                       className="button button-secondary compact"
                       type="button"
-                      onClick={() => setAppealId("")}
+                      onClick={() => {
+                        setAppealId("");
+                        setAppealReason("");
+                        setAppealProofReference("");
+                        setAppealAttachments([]);
+                      }}
                     >
                       Cancel
                     </button>
@@ -374,26 +474,28 @@ export function ModeratorClaimsPage() {
     user?.role === "Admin" ||
     user?.capabilities?.includes("claims:review");
 
-  const loadQueue = useCallback(async () => {
-    try {
-      const [queue, history] = await Promise.all([
-        getPendingClaims(),
-        getReviewedClaims({
-          status: statusFilter || undefined,
-          reviewerId: reviewerId || undefined,
-        }),
-      ]);
-      setPending(queue);
-      setReviewed(history);
-      setMessage("");
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Review queue could not be loaded.",
-      );
-    }
-  }, [reviewerId, statusFilter]);
+  const loadQueue = useCallback(
+    async (
+      filters: { status?: "Approved" | "Rejected"; reviewerId?: string } = {},
+    ) => {
+      try {
+        const [queue, history] = await Promise.all([
+          getPendingClaims(),
+          getReviewedClaims(filters),
+        ]);
+        setPending(queue);
+        setReviewed(history);
+        setMessage("");
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Review queue could not be loaded.",
+        );
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (status === "authenticated" && canReview) void loadQueue();
@@ -427,7 +529,10 @@ export function ModeratorClaimsPage() {
       setMessage(`Claim ${decision.toLowerCase()} and audit history updated.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Review failed.");
-      void loadQueue();
+      void loadQueue({
+        status: statusFilter || undefined,
+        reviewerId: reviewerId || undefined,
+      });
     }
   }
 
@@ -521,7 +626,10 @@ export function ModeratorClaimsPage() {
           className="audit-filters"
           onSubmit={(event) => {
             event.preventDefault();
-            void loadQueue();
+            void loadQueue({
+              status: statusFilter || undefined,
+              reviewerId: reviewerId || undefined,
+            });
           }}
         >
           <label>
