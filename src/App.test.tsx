@@ -14,6 +14,16 @@ import {
   verifyWallet,
 } from "./services/userService";
 import { clearPlatformJwt, setPlatformJwt } from "./auth/platformTokenStore";
+import {
+  createToken,
+  getCreatorTokens,
+  getTokenFeed,
+  getTokenSentiment,
+  listTokens,
+  publishToken,
+  requestMediaUpload,
+  updateToken,
+} from "./services/tokenService";
 
 function renderApplication(initialRoute = "/") {
   return render(
@@ -172,5 +182,76 @@ describe("MemeTokenHub application", () => {
         "Bearer platform-jwt",
       );
     }
+  });
+
+  it("builds token discovery, feed, creator, and sentiment requests", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => new Response("[]", { status: 200 }));
+    await listTokens({
+      search: "frog",
+      network: "Solana",
+      creatorId: "creator-1",
+      sortBy: "popularity",
+      limit: 10,
+      offset: 20,
+    });
+    await getTokenFeed("featured", 6);
+    await getCreatorTokens("creator-1", 10, 5);
+    fetchMock.mockImplementationOnce(
+      async () =>
+        new Response(
+          JSON.stringify({ hotVotes: 1, notVotes: 0, sentimentScore: 100 }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+    );
+    await getTokenSentiment("token-1", "30d");
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/tokens?search=frog&network=Solana&creatorId=creator-1&sortBy=popularity&limit=10&offset=20",
+      "https://api.example.com/api/tokens/feeds/featured?limit=6",
+      "https://api.example.com/api/tokens/by-creator/creator-1?limit=10&offset=5",
+      "https://api.example.com/api/tokens/token-1/sentiment?window=30d",
+    ]);
+  });
+
+  it("uses the platform JWT for token drafts, updates, publishing, and media URLs", async () => {
+    vi.stubEnv("VITE_API_BASE_URL", "https://api.example.com");
+    setPlatformJwt("platform-jwt");
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(
+        async () =>
+          new Response(
+            JSON.stringify({ tokenId: "token-1", name: "Frog", symbol: "FRG" }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+      );
+    const input = {
+      name: "Frog",
+      symbol: "FRG",
+      description: "A frog community",
+      network: "Solana",
+      contractAddress: "contract",
+      category: "Meme",
+    };
+    await createToken(input);
+    await updateToken("token-1", { description: "Updated" });
+    await publishToken("token-1");
+    await requestMediaUpload({
+      fileName: "logo.png",
+      contentType: "image/png",
+      assetType: "Logo",
+    });
+    for (const [, options] of fetchMock.mock.calls)
+      expect(new Headers(options?.headers).get("Authorization")).toBe(
+        "Bearer platform-jwt",
+      );
+    expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
+      "POST",
+      "PUT",
+      "POST",
+      "POST",
+    ]);
   });
 });

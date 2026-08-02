@@ -1392,6 +1392,99 @@ button {
   margin: 15px 0;
   font-size: 52px;
 }
+.data-source-note {
+  margin: -8px 0 22px;
+  color: #69778d;
+  font-size: 9px;
+}
+.project-studio {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.project-list {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #253149;
+  border-radius: 16px;
+  background: #0e1522;
+}
+.project-list button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px;
+  color: #8e9aaf;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  font-size: 10px;
+}
+.project-list button:first-child {
+  justify-content: center;
+  color: #9badff;
+  border-color: #30405c;
+}
+.project-list button.active {
+  color: white;
+  border-color: #3d527c;
+  background: #18243a;
+}
+.project-list span {
+  color: #68758a;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+.project-form {
+  max-width: 760px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.media-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.media-inputs label {
+  padding: 14px;
+  border: 1px dashed #33435f;
+  border-radius: 12px;
+}
+.media-inputs input {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+}
+.media-inputs small {
+  overflow-wrap: anywhere;
+  color: #647188;
+  font-size: 8px;
+}
+.sentiment-window {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 12px;
+}
+.sentiment-window button {
+  padding: 6px 9px;
+  color: #7e8ba0;
+  border: 1px solid #28354c;
+  border-radius: 7px;
+  background: #0d1522;
+  font-size: 9px;
+}
+.sentiment-window button.active {
+  color: white;
+  border-color: #5873ef;
+  background: #243764;
+}
 .public-profile-card p {
   color: #8d99ad;
   line-height: 1.7;
@@ -2124,7 +2217,10 @@ body {
   .directory-filters,
   .settings-grid,
   .people-results,
-  .public-profile-card {
+  .public-profile-card,
+  .project-studio,
+  .form-row,
+  .media-inputs {
     grid-template-columns: 1fr;
   }
   .person-result {

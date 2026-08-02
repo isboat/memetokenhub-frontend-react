@@ -109,6 +109,12 @@ The frontend includes typed User Service clients and user-facing flows for the r
 
 Private profile fields and wallet/provider proofs are never rendered in the public profile page. Role administration is capability-gated in the UI and intentionally excludes assigning `Moderator`; the backend remains authoritative for ownership and authorization on every protected request.
 
+### Token Service feature coverage
+
+The Token Service client covers list/search/filter/sort/pagination, details, deterministic feeds, analytics, creator projects, supported networks, sentiment windows, project draft creation and updates, signed media uploads, and publication. Public discovery and token details use live API data when the Gateway is configured and retain clearly labelled preview data when it is unavailable.
+
+Developers with `projects:write` can use `/projects/manage` to create and edit drafts, upload validated logo/banner types through signed URLs, and publish completed project homes. Signed upload responses are sent directly to approved object storage; the browser persists only the returned asset URL. The `/token/:tokenId` experience composes canonical detail, analytics, and transparent sentiment reads without mutating Social Service votes or follows.
+
 ## Continuous integration and deployment
 
 ### Main deployment

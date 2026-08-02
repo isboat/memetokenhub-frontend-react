@@ -7,6 +7,7 @@ const navigationItems = [
   { label: "Discover", to: "/" },
   { label: "Community", to: "/community" },
   { label: "People", to: "/people" },
+  { label: "Launch", to: "/projects/manage" },
   { label: "Learn", to: "/learn" },
 ];
 

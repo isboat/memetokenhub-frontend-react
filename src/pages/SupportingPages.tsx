@@ -10,9 +10,19 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuth } from "../auth/authContext";
 import { communityLeaders, memeTokens } from "../data/mockData";
 import { TokenCard } from "../components/TokenCard";
+import {
+  getToken,
+  getTokenAnalytics,
+  getTokenSentiment,
+  type TokenAnalytics,
+  type TokenProject,
+  type TokenSentiment,
+  type SentimentWindow,
+} from "../services/tokenService";
 
 export function CommunityPage() {
   return (
@@ -110,6 +120,30 @@ export function LearnPage() {
 export function TokenDetailsPage() {
   const { tokenId } = useParams();
   const token = memeTokens.find((item) => item.id === tokenId) ?? memeTokens[0];
+  const [project, setProject] = useState<TokenProject | null>(null);
+  const [analytics, setAnalytics] = useState<TokenAnalytics | null>(null);
+  const [sentiment, setSentiment] = useState<TokenSentiment | null>(null);
+  const [sentimentWindow, setSentimentWindow] = useState<SentimentWindow>("7d");
+  useEffect(() => {
+    if (!tokenId) return;
+    let active = true;
+    Promise.all([
+      getToken(tokenId),
+      getTokenAnalytics(tokenId),
+      getTokenSentiment(tokenId, sentimentWindow),
+    ])
+      .then(([detail, stats, vibe]) => {
+        if (active) {
+          setProject(detail);
+          setAnalytics(stats);
+          setSentiment(vibe);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [sentimentWindow, tokenId]);
   return (
     <main className="subpage page-shell">
       <Link className="back-link" to="/">
@@ -122,18 +156,24 @@ export function TokenDetailsPage() {
             background: `linear-gradient(145deg, ${token.colors[0]}, ${token.colors[1]})`,
           }}
         >
-          {token.mascot}
+          {project?.logoUrl ? (
+            <img src={project.logoUrl} alt="" />
+          ) : (
+            token.mascot
+          )}
         </div>
         <div>
           <span className="eyebrow purple">
             <BadgeCheck size={14} /> Verified project
           </span>
           <h1>
-            {token.name} <span>${token.symbol}</span>
+            {project?.name ?? token.name}{" "}
+            <span>${project?.symbol ?? token.symbol}</span>
           </h1>
           <p>
-            {token.description} Join {token.supporters} community members
-            following the story.
+            {project?.description ?? token.description} Join{" "}
+            {project?.community?.followersCount ?? token.supporters} community
+            members following the story.
           </p>
           <div className="hero-actions">
             <button className="button button-primary" type="button">
@@ -148,21 +188,41 @@ export function TokenDetailsPage() {
       <div className="detail-stats">
         <article>
           <span>Live price</span>
-          <strong>{token.price}</strong>
+          <strong>
+            {analytics?.price !== undefined
+              ? `$${analytics.price.toLocaleString()}`
+              : token.price}
+          </strong>
           <em className={token.change >= 0 ? "positive" : "negative"}>
             {token.change}% today
           </em>
         </article>
         <article>
           <span>Market cap</span>
-          <strong>{token.marketCap}</strong>
-          <em>{token.network}</em>
+          <strong>
+            {analytics?.marketCap !== undefined
+              ? `$${analytics.marketCap.toLocaleString()}`
+              : token.marketCap}
+          </strong>
+          <em>{project?.network ?? token.network}</em>
         </article>
         <article>
           <span>Community vibe</span>
-          <strong>{token.sentiment}% hot</strong>
+          <strong>{sentiment?.sentimentScore ?? token.sentiment}% hot</strong>
           <em>Organic sentiment</em>
         </article>
+      </div>
+      <div className="sentiment-window" aria-label="Sentiment time window">
+        {(["24h", "7d", "30d", "all"] as const).map((item) => (
+          <button
+            className={sentimentWindow === item ? "active" : ""}
+            type="button"
+            key={item}
+            onClick={() => setSentimentWindow(item)}
+          >
+            {item}
+          </button>
+        ))}
       </div>
       <section className="related">
         <h2>More from the hub</h2>

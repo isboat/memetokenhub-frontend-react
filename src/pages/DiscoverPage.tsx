@@ -10,17 +10,76 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { TokenCard } from "../components/TokenCard";
 import { communityLeaders, memeTokens, networks } from "../data/mockData";
+import {
+  getNetworks,
+  getTokenFeed,
+  type TokenProject,
+} from "../services/tokenService";
+import type { MemeToken } from "../types";
+
+function projectToCard(project: TokenProject): MemeToken {
+  const sentiment = project.community?.sentimentScore ?? 0;
+  return {
+    id: project.tokenId,
+    name: project.name,
+    symbol: project.symbol,
+    description: project.description,
+    network: project.network,
+    price:
+      project.metadata?.price !== undefined
+        ? `$${project.metadata.price.toLocaleString()}`
+        : "—",
+    change: 0,
+    marketCap:
+      project.metadata?.marketCap !== undefined
+        ? `$${project.metadata.marketCap.toLocaleString()}`
+        : "—",
+    supporters: String(project.community?.supportersCount ?? 0),
+    sentiment,
+    status:
+      project.status === "Featured"
+        ? "Trending"
+        : project.launchStatus === "Published"
+          ? "Verified"
+          : "New",
+    colors: ["#5271ff", "#20d9c2"],
+    mascot: "🪙",
+  };
+}
 
 export function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
+  const [tokens, setTokens] = useState<MemeToken[]>(memeTokens);
+  const [networkOptions, setNetworkOptions] = useState(networks);
+  const [feedNotice, setFeedNotice] = useState(
+    "Showing preview data while live discovery connects.",
+  );
+  useEffect(() => {
+    let active = true;
+    Promise.all([getTokenFeed("trending", 12), getNetworks()])
+      .then(([projects, supported]) => {
+        if (active) {
+          setTokens(projects.map(projectToCard));
+          setNetworkOptions([
+            "All networks",
+            ...supported.map((item) => item.network),
+          ]);
+          setFeedNotice("Live Token Service discovery.");
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
   const visibleTokens = useMemo(
     () =>
-      memeTokens.filter((token) => {
+      tokens.filter((token) => {
         const matchesSearch = `${token.name} ${token.symbol}`
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
@@ -30,7 +89,7 @@ export function DiscoverPage() {
             token.network === selectedNetwork)
         );
       }),
-    [searchTerm, selectedNetwork],
+    [searchTerm, selectedNetwork, tokens],
   );
 
   return (
@@ -102,7 +161,7 @@ export function DiscoverPage() {
 
         <section className="ticker" aria-label="Market highlights">
           <div className="ticker-track">
-            {memeTokens.slice(0, 5).map((token) => (
+            {tokens.slice(0, 5).map((token) => (
               <div key={token.id}>
                 <span>{token.mascot}</span>
                 <strong>${token.symbol}</strong>
@@ -138,7 +197,7 @@ export function DiscoverPage() {
               />
             </label>
             <div className="network-filters" aria-label="Filter by network">
-              {networks.map((network) => (
+              {networkOptions.map((network) => (
                 <button
                   className={network === selectedNetwork ? "active" : ""}
                   key={network}
@@ -150,6 +209,7 @@ export function DiscoverPage() {
               ))}
             </div>
           </div>
+          <p className="data-source-note">{feedNotice}</p>
           {visibleTokens.length > 0 ? (
             <div className="token-grid">
               {visibleTokens.map((token) => (

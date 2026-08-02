@@ -15,6 +15,7 @@ import {
   PublicUserProfilePage,
   RoleAdministrationPage,
 } from "./pages/UserPages";
+import { ProjectManagementPage } from "./pages/ProjectManagementPage";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/profile" element={<AccountSettingsPage />} />
         <Route path="/profile/:userId" element={<PublicUserProfilePage />} />
         <Route path="/admin/users" element={<RoleAdministrationPage />} />
+        <Route path="/projects/manage" element={<ProjectManagementPage />} />
         <Route path="/token/:tokenId" element={<TokenDetailsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
