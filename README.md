@@ -13,6 +13,73 @@ A modern, responsive React single-page application for discovering meme-token pr
 
 The current UI uses clearly labelled local sample data while backend services are being provisioned. Market figures are illustrative and must not be presented as live data. The application is structured so the documented API Gateway, Privy token exchange, and Helio checkout can be connected without making the browser authoritative for verification or payment status.
 
+## How the application works
+
+MemeTokenHub brings project discovery, community activity, creator content, identity verification, and creator monetization into one responsive single-page application:
+
+1. **Public discovery** — visitors can browse projects, search by name or symbol, filter by network, inspect project details, review community sentiment, find people, and read educational content without signing in.
+2. **Privy authentication** — protected actions start with Privy's email or wallet login. After Privy succeeds, the browser exchanges the short-lived Privy access token for a MemeTokenHub platform JWT through the API Gateway.
+3. **Platform authorization** — the platform JWT identifies the user and carries their role and capabilities. Pages such as project launch, moderation, role administration, and creator earnings show only the controls appropriate to that account; backend services still enforce every authorization rule.
+4. **Domain services through the Gateway** — typed frontend clients call the User, Token, Social, Claim, Payment, and Notification services through `VITE_API_BASE_URL`. The browser never connects directly to a service database.
+5. **Server-authoritative outcomes** — optimistic UI improves responsiveness, but the backend remains authoritative for votes, follower counts, verification, moderation, payment confirmation, entitlements, and notifications. Returning from checkout does not unlock content until Payment Service confirms the provider webhook.
+
+The platform JWT is kept in memory rather than local storage. Refreshing the page asks Privy for the current session and performs the exchange again. If Privy login succeeds but the exchange fails, protected pages show **Retry secure session** and **Sign out** instead of asking the user to connect to Privy a second time.
+
+## Navigating the application
+
+### Global navigation
+
+The header is available on every page:
+
+- Select the **MemeTokenHub** logo to return to Discover.
+- Use **Discover**, **Community**, **Insights**, **People**, **Launch**, **Verify**, and **Learn** on desktop.
+- Select the menu icon on mobile or narrow tablets to open the same primary links.
+- Select the bell icon to open the notification center.
+- Select **Watchlist** to open the personalized dashboard.
+- Select **Connect** to sign in with Privy. Once authenticated, the same area links to the user's profile and provides a sign-out button.
+- Use the footer shortcuts to open notifications, payments and access, verification, safety information, and the main public areas.
+
+Role-specific destinations such as My network, creator earnings, moderation, and user administration are not part of the primary header. Their direct routes are listed in the goal and route tables below; the backend still checks the signed-in account before returning protected data.
+
+### Recommended first-time journey
+
+1. Start on **Discover** and search for a project or choose a network filter.
+2. Open a project card to view its canonical profile, analytics, organic sentiment, supporters, comments, and community votes.
+3. Visit **People** or **Community** to find creators and public profiles.
+4. Select **Connect** when you want to follow, publish, verify a relationship, manage payments, or personalize notifications.
+5. After signing in, use **Watchlist** and open `/network` to revisit tracked projects, creators, and activity.
+
+### Navigation by goal
+
+| Goal                          | Where to go                                  | What the user can do                                                                                         |
+| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Find meme-token projects      | **Discover** (`/`)                           | Search, filter by network, review trending projects, and open project pages.                                 |
+| Inspect a project             | `/token/:tokenId`                            | View project identity, analytics, sentiment windows, comments, support, and Hot/NotHot voting.               |
+| Find community members        | **People** (`/people`)                       | Search public-safe profiles by name, account type, verification, and network.                                |
+| Explore community leaders     | **Community** (`/community`)                 | View reputation leaderboards and established community voices.                                               |
+| Read or publish insights      | **Insights** (`/insights`)                   | Browse posts; eligible KOLs and developers can publish public or subscriber-labelled content.                |
+| Review followed activity      | `/network`                                   | View the authenticated user's tracked users, tokens, networks, and personalized activity feed.               |
+| Manage a profile              | Profile button → `/profile`                  | Update the private account profile, wallet verification, and connected social channels.                      |
+| Launch a project              | **Launch** (`/projects/manage`)              | Developers and creators can create drafts, upload media, edit project data, and publish completed projects.  |
+| Verify a project relationship | **Verify** (`/claims`)                       | Submit ownership, social-identity, or representative evidence; review history and appeal a rejection.        |
+| View a public verification    | `/claims/:claimId/status`                    | View the redacted public status without exposing evidence or moderator notes.                                |
+| Review claims                 | `/moderation/claims`                         | Moderators can inspect private evidence, approve or reject claims, and search audit history.                 |
+| Manage purchases and access   | Footer → **Payments & access** (`/payments`) | Review checkout terms, open secure provider checkout, inspect receipts and entitlements, and cancel renewal. |
+| Review creator revenue        | `/creator/earnings`                          | Eligible creators can filter ledger-backed gross revenue, fees, net earnings, and transactions.              |
+| Manage alerts                 | Bell icon → `/notifications`                 | Filter unread notifications, mark items read, and configure channel, event, and digest preferences.          |
+| Learn about trust and safety  | **Learn** (`/learn`)                         | Understand verification, organic trends, provenance, and platform safety boundaries.                         |
+
+### Access by account type
+
+- **Visitors** can use discovery, project details, public profiles, community pages, public insights, public verification status, and the trust center.
+- **Authenticated members** can manage their profile, network, notifications, payments, claim submissions, follows, comments, and votes.
+- **Developers and creators** can receive project-writing capabilities for Launch.
+- **KOLs and creators** can publish eligible insights and access their private earnings dashboard.
+- **Moderators** can access claim review when their JWT includes the `claims:review` capability or moderator role.
+- **Administrators** can access user-role administration at `/admin/users`; sensitive roles remain backend-controlled.
+
+If a user opens a protected page before signing in, the page explains why authentication is required. If the account lacks the required role or capability after authentication, the page displays an access-required message rather than rendering unauthorized controls.
+
 ## Technology
 
 - React 19 with TypeScript
@@ -55,18 +122,27 @@ Vite prints the local development URL, normally `http://localhost:5173`.
 
 ## Routes
 
-| Route                | Description                                                                    |
-| -------------------- | ------------------------------------------------------------------------------ |
-| `/`                  | Public token discovery, search, filters, community voices, and trust overview. |
-| `/token/:tokenId`    | Project identity, price context, and organic sentiment.                        |
-| `/community`         | Verified community voices.                                                     |
-| `/learn`             | Verification and organic-discovery trust center.                               |
-| `/dashboard`         | Protected personalized experience.                                             |
-| `/claims`            | Private claim submission, history, evidence uploads, and appeals.              |
-| `/moderation/claims` | Capability-gated claim review and audit history.                               |
-| `/notifications`     | Subject-derived inbox, read state, channel controls, and digest preferences.   |
-| `/payments`          | Checkout disclosures, entitlements, renewal cancellation, and receipts.        |
-| `/creator/earnings`  | Private creator revenue, fee, and transaction summaries.                       |
+| Route                     | Description                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `/`                       | Public token discovery, search, filters, community voices, and trust overview. |
+| `/token/:tokenId`         | Project identity, price context, and organic sentiment.                        |
+| `/community`              | Community reputation leaderboards and verified voices.                         |
+| `/network`                | Protected tracked targets and personalized social activity.                    |
+| `/insights`               | Public content discovery and eligible creator/KOL publishing.                  |
+| `/people`                 | Public-safe user search and profile discovery.                                 |
+| `/profile`                | Protected profile, wallet, social-channel, and account settings.               |
+| `/profile/:userId`        | Public-safe user profile and social context.                                   |
+| `/learn`                  | Verification and organic-discovery trust center.                               |
+| `/about`                  | Product mission and trust information.                                         |
+| `/dashboard`              | Protected personalized experience.                                             |
+| `/projects/manage`        | Capability-gated project creation, media, editing, and publication.            |
+| `/claims`                 | Private claim submission, history, evidence uploads, and appeals.              |
+| `/claims/:claimId/status` | Public, redacted claim-verification status.                                    |
+| `/moderation/claims`      | Capability-gated claim review and audit history.                               |
+| `/notifications`          | Subject-derived inbox, read state, channel controls, and digest preferences.   |
+| `/payments`               | Checkout disclosures, entitlements, renewal cancellation, and receipts.        |
+| `/creator/earnings`       | Private creator revenue, fee, and transaction summaries.                       |
+| `/admin/users`            | Capability-gated user-role administration.                                     |
 
 Unknown routes display a branded not-found page.
 
