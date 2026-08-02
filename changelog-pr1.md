@@ -41,6 +41,7 @@ The cumulative PR was built through the following commits before this changelog 
 - Security boundaries that keep internal webhooks, notification delivery, private claim evidence, and backend-authoritative state out of browser control.
 - Vitest and Testing Library coverage for the main UI and service contracts.
 - Playwright browser automation with a Chromium smoke test and a repeatable browser/system-dependency installation command.
+- Reproducible Playwright screenshot capture for desktop and mobile visual review.
 - GitHub Actions workflows for pull-request verification and main-branch Azure deployment.
 - A comprehensive README covering setup, architecture, service coverage, navigation, roles, routes, CI/CD, and dependency notices.
 - A documentation submodule containing the source product and service specifications.
