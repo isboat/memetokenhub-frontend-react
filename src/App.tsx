@@ -1,3 +1,16 @@
+import { HubHomePage } from "./features/hub/HubLayout";
+import {
+  NetworksPage,
+  ExchangesPage,
+  LaunchpadsPage,
+} from "./features/hub/DirectoryPages";
+import {
+  UpcomingPage,
+  UpcomingDetailsPage,
+  UpcomingEditor,
+} from "./features/hub/UpcomingPages";
+import { EventsPage, EventEditor } from "./features/hub/EventPages";
+import { ActivityPage } from "./features/hub/ActivityPage";
 import { Route, Routes } from "react-router-dom";
 import { AppHeader } from "./components/AppHeader";
 import { Footer } from "./components/Footer";
@@ -42,6 +55,18 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<DiscoverPage />} />
+        <Route path="/hub" element={<HubHomePage />} />
+        <Route path="/upcoming" element={<UpcomingPage />} />
+        <Route path="/upcoming/new" element={<UpcomingEditor />} />
+        <Route path="/upcoming/:id" element={<UpcomingDetailsPage />} />
+        <Route path="/upcoming/:id/edit" element={<UpcomingEditor />} />
+        <Route path="/launchpads" element={<LaunchpadsPage />} />
+        <Route path="/networks" element={<NetworksPage />} />
+        <Route path="/exchanges" element={<ExchangesPage />} />
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/new" element={<EventEditor />} />
+        <Route path="/events/:id/edit" element={<EventEditor />} />
+        <Route path="/hub/activity" element={<ActivityPage />} />
         <Route path="/community" element={<CommunityNetworkPage />} />
         <Route path="/network" element={<MySocialPage />} />
         <Route path="/insights" element={<InsightsPage />} />

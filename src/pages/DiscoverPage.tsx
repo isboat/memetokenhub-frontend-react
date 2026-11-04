@@ -41,12 +41,7 @@ function projectToCard(project: TokenProject): MemeToken {
         : "—",
     supporters: String(project.community?.supportersCount ?? 0),
     sentiment,
-    status:
-      project.status === "Featured"
-        ? "Trending"
-        : project.launchStatus === "Published"
-          ? "Verified"
-          : "New",
+    status: project.status === "Featured" ? "Trending" : "New",
     colors: ["#5271ff", "#20d9c2"],
     mascot: "🪙",
   };

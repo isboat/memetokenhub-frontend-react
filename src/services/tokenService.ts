@@ -33,6 +33,7 @@ export interface TokenProject {
   websiteUrl?: string;
   socialLinks?: TokenSocialLink[];
   publishedAt?: string;
+  upcomingProfileId?: string;
   metadata?: {
     supply?: number;
     price?: number;

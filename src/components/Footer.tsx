@@ -22,6 +22,12 @@ export function Footer() {
           <Link to="/">Discover</Link>
           <Link to="/community">Community</Link>
           <Link to="/learn">Learn</Link>
+          <Link to="/upcoming">Upcoming projects</Link>
+          <Link to="/launchpads">Launchpads</Link>
+          <Link to="/events">Spaces &amp; events</Link>
+          <Link to="/exchanges">Exchanges</Link>
+          <Link to="/networks">Networks</Link>
+          <Link to="/hub/activity">Hub activity</Link>
         </div>
         <div>
           <h3>Company</h3>
@@ -37,6 +43,7 @@ export function Footer() {
           <Link to="/notifications">Notifications</Link>
           <Link to="/payments">Payments &amp; access</Link>
           <Link to="/claims">Verification</Link>
+          <Link to="/projects/manage">Manage live projects</Link>
         </div>
         <div>
           <h3>Join the conversation</h3>

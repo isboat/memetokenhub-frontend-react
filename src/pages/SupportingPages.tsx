@@ -120,7 +120,9 @@ export function LearnPage() {
 
 export function TokenDetailsPage() {
   const { tokenId } = useParams();
-  const token = memeTokens.find((item) => item.id === tokenId) ?? memeTokens[0];
+  const sampleToken = memeTokens.find((item) => item.id === tokenId);
+  const token = sampleToken ?? memeTokens[0];
+  const [projectLoading, setProjectLoading] = useState(true);
   const [project, setProject] = useState<TokenProject | null>(null);
   const [analytics, setAnalytics] = useState<TokenAnalytics | null>(null);
   const [sentiment, setSentiment] = useState<TokenSentiment | null>(null);
@@ -129,6 +131,8 @@ export function TokenDetailsPage() {
   useEffect(() => {
     if (!tokenId) return;
     let active = true;
+    setProject(null);
+    setProjectLoading(true);
     getToken(tokenId)
       .then((detail) => {
         if (active) {
@@ -139,6 +143,9 @@ export function TokenDetailsPage() {
       .catch(() => {
         if (active)
           setDataNotice("Project API unavailable; showing preview data.");
+      })
+      .finally(() => {
+        if (active) setProjectLoading(false);
       });
     return () => {
       active = false;
@@ -172,6 +179,24 @@ export function TokenDetailsPage() {
       active = false;
     };
   }, [sentimentWindow, tokenId]);
+  if (!sampleToken && !project)
+    return (
+      <main className="subpage page-shell">
+        <h1>
+          {projectLoading
+            ? "Loading token profile…"
+            : "Token profile unavailable"}
+        </h1>
+        <p>
+          {projectLoading
+            ? "Retrieving the permanent project record."
+            : "We could not retrieve this token. No sample token is shown in its place."}
+        </p>
+        <Link className="button button-secondary" to="/upcoming">
+          Back to upcoming projects
+        </Link>
+      </main>
+    );
   return (
     <main className="subpage page-shell">
       <Link className="back-link" to="/">
@@ -192,8 +217,7 @@ export function TokenDetailsPage() {
         </div>
         <div>
           <span className="eyebrow purple">
-            <BadgeCheck size={14} />{" "}
-            {project?.launchStatus ?? "Preview project"}
+            <Sparkles size={14} /> {project?.launchStatus ?? "Preview project"}
           </span>
           <h1>
             {project?.name ?? token.name}{" "}
@@ -201,8 +225,10 @@ export function TokenDetailsPage() {
           </h1>
           <p>
             {project?.description ?? token.description} Join{" "}
-            {project?.community?.followersCount ?? token.supporters} community
-            members following the story.
+            {project
+              ? (project.community?.followersCount ?? 0)
+              : token.supporters}{" "}
+            community members following the story.
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="#community-signal">
@@ -215,16 +241,26 @@ export function TokenDetailsPage() {
         </div>
       </div>
       <p className="data-source-note">{dataNotice}</p>
+      {project?.upcomingProfileId && (
+        <Link
+          className="button button-secondary"
+          to={`/upcoming/${encodeURIComponent(project.upcomingProfileId)}`}
+        >
+          View launch story &amp; permanent update history
+        </Link>
+      )}
       <div className="detail-stats">
         <article>
           <span>Live price</span>
           <strong>
             {analytics?.price !== undefined
               ? `$${analytics.price.toLocaleString()}`
-              : token.price}
+              : project
+                ? "Not available"
+                : token.price}
           </strong>
           <em className={token.change >= 0 ? "positive" : "negative"}>
-            {token.change}% today
+            {project ? "Price change not available" : `${token.change}% today`}
           </em>
         </article>
         <article>
@@ -232,13 +268,21 @@ export function TokenDetailsPage() {
           <strong>
             {analytics?.marketCap !== undefined
               ? `$${analytics.marketCap.toLocaleString()}`
-              : token.marketCap}
+              : project
+                ? "Not available"
+                : token.marketCap}
           </strong>
           <em>{project?.network ?? token.network}</em>
         </article>
         <article>
           <span>Community vibe</span>
-          <strong>{sentiment?.sentimentScore ?? token.sentiment}% hot</strong>
+          <strong>
+            {sentiment
+              ? `${sentiment.sentimentScore}% hot`
+              : project
+                ? "Not available"
+                : `${token.sentiment}% hot`}
+          </strong>
           <em>Organic sentiment</em>
         </article>
       </div>

@@ -8,7 +8,8 @@ const navigationItems = [
   { label: "Community", to: "/community" },
   { label: "Insights", to: "/insights" },
   { label: "People", to: "/people" },
-  { label: "Launch", to: "/projects/manage" },
+  { label: "Hub", to: "/hub" },
+  { label: "Launch", to: "/upcoming" },
   { label: "Verify", to: "/claims" },
   { label: "Learn", to: "/learn" },
 ];
